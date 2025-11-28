@@ -61,29 +61,16 @@ interface EditNovelSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   novel: Novel;
+  onSave: (data: FormValues) => void;
 }
 
-export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProps) {
+export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelSheetProps) {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: novel.title,
-      author: novel.author,
-      description: novel.description,
-      coverUrl: novel.coverImage.imageUrl,
-      genreIds: novel.genreIds,
-      tags: [], // Placeholder for tags
-      status: novel.status,
-      freeChapters: 10, // Placeholder
-      coinCost: novel.chapters.find(c => c.cost > 0)?.cost || 0,
-      isFree: novel.isFree,
-      isR18: novel.isR18,
-      isFeatured: false, // Placeholder
-    },
   });
 
   const coverUrl = form.watch("coverUrl");
@@ -91,22 +78,24 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
   const isFree = form.watch("isFree");
 
   useEffect(() => {
-    form.reset({
-      title: novel.title,
-      author: novel.author,
-      description: novel.description,
-      coverUrl: novel.coverImage.imageUrl,
-      genreIds: novel.genreIds,
-      tags: [],
-      status: novel.status,
-      freeChapters: novel.isFree ? 0 : 10,
-      coinCost: novel.isFree ? 0 : novel.chapters.find(c => c.cost > 0)?.cost || 0,
-      isFree: novel.isFree,
-      isR18: novel.isR18,
-      isFeatured: false,
-    });
-    setCoverPreview(null);
-    setCoverFile(null);
+    if (open && novel) {
+      form.reset({
+        title: novel.title,
+        author: novel.author,
+        description: novel.description,
+        coverUrl: novel.coverImage.imageUrl,
+        genreIds: novel.genreIds,
+        tags: [],
+        status: novel.status,
+        freeChapters: novel.isFree ? 0 : 10,
+        coinCost: novel.isFree ? 0 : novel.chapters.find(c => c.cost > 0)?.cost || 0,
+        isFree: novel.isFree,
+        isR18: novel.isR18,
+        isFeatured: false, // Placeholder for isFeatured
+      });
+      setCoverPreview(null);
+      setCoverFile(null);
+    }
   }, [novel, form, open]);
 
   useEffect(() => {
@@ -140,7 +129,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
   };
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    onSave(data);
     onOpenChange(false);
   };
 
@@ -335,7 +324,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                             <SelectTrigger>
                                 <SelectValue placeholder="Pilih status" />

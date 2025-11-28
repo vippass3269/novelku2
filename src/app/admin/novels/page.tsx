@@ -1,7 +1,7 @@
 
 "use client";
 
-import { novels as initialNovels, genres } from "@/lib/data";
+import { novels as initialNovels, genres, type Chapter } from "@/lib/data";
 import type { Novel } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,63 @@ export default function KelolaNovelPage() {
     setNovelToDelete(null);
     setIsDeleteAlertOpen(false);
   };
+
+  const handleAddNovel = (data: any) => {
+    const newNovel: Novel = {
+      id: `novel-${Date.now()}`,
+      slug: data.title.toLowerCase().replace(/\s+/g, '-'),
+      title: data.title,
+      author: data.author,
+      description: data.description,
+      coverImage: {
+          id: 'new-cover',
+          imageUrl: data.coverUrl || 'https://placehold.co/400x600/0f172a/94a3b8?text=Cover',
+          imageHint: 'novel cover',
+          description: `Cover for ${data.title}`
+      },
+      genreIds: data.genreIds,
+      chapters: [] as Chapter[],
+      stats: {
+          rating: 0,
+          views: 0
+      },
+      isFree: data.isFree,
+      isR18: data.isR18,
+      status: data.status,
+    };
+    setNovels(prev => [newNovel, ...prev]);
+    toast({
+        title: "Novel Ditambahkan",
+        description: `Novel "${data.title}" berhasil dibuat.`,
+    });
+  }
+
+  const handleUpdateNovel = (data: any) => {
+    if(!selectedNovel) return;
+    
+    setNovels(prev => prev.map(novel => {
+        if(novel.id === selectedNovel.id) {
+            return {
+                ...novel,
+                title: data.title,
+                author: data.author,
+                description: data.description,
+                coverImage: data.coverUrl ? { ...novel.coverImage, imageUrl: data.coverUrl } : novel.coverImage,
+                genreIds: data.genreIds,
+                status: data.status,
+                isFree: data.isFree,
+                isR18: data.isR18,
+                // other fields from form can be updated here
+            }
+        }
+        return novel;
+    }));
+
+     toast({
+        title: "Novel Diperbarui",
+        description: `Novel "${data.title}" berhasil diperbarui.`,
+    });
+  }
 
 
   return (
@@ -204,6 +261,7 @@ export default function KelolaNovelPage() {
       <AddNovelSheet
         open={isAddSheetOpen}
         onOpenChange={setIsAddSheetOpen}
+        onSave={handleAddNovel}
       />
       
       {selectedNovel && (
@@ -211,6 +269,7 @@ export default function KelolaNovelPage() {
           open={isEditSheetOpen}
           onOpenChange={setIsEditSheetOpen}
           novel={selectedNovel}
+          onSave={handleUpdateNovel}
         />
       )}
 

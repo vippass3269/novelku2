@@ -60,9 +60,10 @@ type FormValues = z.infer<typeof formSchema>;
 interface AddNovelSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: (data: FormValues) => void;
 }
 
-export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
+export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps) {
   const [coverPreview, setCoverPreview] = useState<string | null>('https://placehold.co/400x600/0f172a/94a3b8?text=Cover');
   const [tagInput, setTagInput] = useState("");
 
@@ -100,7 +101,7 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
 
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    onSave(data);
     onOpenChange(false);
     form.reset();
   };
