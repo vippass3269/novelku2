@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { MoreHorizontal, ArrowLeft, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { MoreHorizontal, ArrowLeft, CheckCircle, XCircle, Shield, User as UserIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -29,10 +29,11 @@ export default function ManageAuthorsPage() {
     });
   };
   
-  const handleRoleChange = (userId: string, newRole: 'admin' | 'writer') => {
+  const handleRoleChange = (userId: string, newRole: 'admin' | 'writer' | 'user') => {
     setUsers(users.map(user => {
         if (user.id === userId) {
-            return { ...user, role: newRole, verificationStatus: 'approved' };
+            const newStatus = newRole === 'user' ? 'rejected' : 'approved';
+            return { ...user, role: newRole, verificationStatus: newStatus };
         }
         return user;
     }));
@@ -127,7 +128,7 @@ export default function ManageAuthorsPage() {
                                 </DropdownMenuItem>
                               </>
                           )}
-                          {user.role !== 'admin' && user.verificationStatus === 'approved' && (
+                          {user.role === 'writer' && user.verificationStatus === 'approved' && (
                              <DropdownMenuItem onClick={() => handleRoleChange(user.id, 'admin')}>
                                 <Shield className="mr-2 h-4 w-4" />
                                 Jadikan Admin
@@ -135,8 +136,14 @@ export default function ManageAuthorsPage() {
                           )}
                            {user.role === 'admin' && (
                              <DropdownMenuItem onClick={() => handleRoleChange(user.id, 'writer')}>
-                                <Shield className="mr-2 h-4 w-4" />
+                                <UserIcon className="mr-2 h-4 w-4" />
                                 Jadikan Penulis
+                            </DropdownMenuItem>
+                          )}
+                          {(user.role === 'admin' || user.role === 'writer') && (
+                             <DropdownMenuItem className="text-destructive" onClick={() => handleRoleChange(user.id, 'user')}>
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Hapus Akses Penulis/Admin
                             </DropdownMenuItem>
                           )}
                       </DropdownMenuContent>
@@ -151,3 +158,4 @@ export default function ManageAuthorsPage() {
     </div>
   );
 }
+
