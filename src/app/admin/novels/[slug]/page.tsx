@@ -39,9 +39,11 @@ export default function ManageNovelChaptersPage({ params }: { params: { slug: st
                     {novel.chapters.length} chapter • {freeChapters} chapter gratis • {coinCost > 0 ? `${coinCost} koin/chapter` : 'Gratis'}
                 </p>
             </div>
-            <Button size="lg">
+            <Button size="lg" asChild>
+              <Link href={`/admin/novels/${novel.slug}/new`}>
                 <Plus className="mr-2 h-5 w-5" />
                 Tambah Chapter
+              </Link>
             </Button>
         </div>
 
