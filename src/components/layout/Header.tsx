@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users, Image as ImageIcon } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users, Image as ImageIcon, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -67,6 +67,7 @@ export default function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="start">
                     <DropdownMenuGroup>
+                      <DropdownMenuLabel>Manajemen</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                            <Link href="/admin/dashboard">
                               <Shield className="mr-2 h-4 w-4" />
@@ -83,6 +84,12 @@ export default function Header() {
                            <Link href="/admin/users">
                               <Users className="mr-2 h-4 w-4" />
                               <span>Manajemen Pengguna</span>
+                          </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                           <Link href="/admin/community">
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              <span>Moderasi Komunitas</span>
                           </Link>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
