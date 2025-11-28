@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogIn, User, Coins } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -75,19 +75,34 @@ export default function Header() {
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">Pengguna</p>
+                        <p className="text-sm font-medium leading-none">Pengguna Novelku</p>
                         <p className="text-xs leading-none text-muted-foreground">
                           pengguna@novelku.com
                         </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profil</span>
+                    <DropdownMenuItem asChild>
+                        <Link href="/library">
+                            <Library className="mr-2 h-4 w-4" />
+                            <span>Perpustakaan</span>
+                        </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/top-up">
+                            <Store className="mr-2 h-4 w-4" />
+                            <span>Toko Koin</span>
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/admin/novels">
+                            <BookUp className="mr-2 h-4 w-4" />
+                            <span>Kelola Novel</span>
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <LogIn className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-2 h-4 w-4" />
                       <span>Keluar</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -95,7 +110,7 @@ export default function Header() {
               </>
             ) : (
               <Button>
-                <LogIn className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 h-4 w-4" />
                 Masuk
               </Button>
             )}
