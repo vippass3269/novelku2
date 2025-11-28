@@ -18,8 +18,8 @@ import { useState } from "react";
 import { TopUpDialog } from "../top-up/TopUpDialog";
 
 export default function Header() {
-  const { coins } = useUser();
-  const isLoggedIn = true; // Placeholder for user auth status
+  const { user, coins } = useUser();
+  const isLoggedIn = !!user;
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
 
   return (
@@ -67,17 +67,17 @@ export default function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User" />
-                        <AvatarFallback>U</AvatarFallback>
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">Pengguna Novelku</p>
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
                         <p className="text-xs leading-none text-muted-foreground">
-                          pengguna@novelku.com
+                          {user.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
@@ -94,12 +94,14 @@ export default function Header() {
                             <span>Toko Koin</span>
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/admin/novels">
-                            <BookUp className="mr-2 h-4 w-4" />
-                            <span>Kelola Novel</span>
-                        </Link>
-                    </DropdownMenuItem>
+                    {user.role === 'admin' && (
+                      <DropdownMenuItem asChild>
+                          <Link href="/admin/novels">
+                              <BookUp className="mr-2 h-4 w-4" />
+                              <span>Kelola Novel</span>
+                          </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <LogOut className="mr-2 h-4 w-4" />

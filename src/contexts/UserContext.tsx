@@ -1,9 +1,18 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+interface User {
+  name: string;
+  email: string;
+  avatar: string;
+  role: 'user' | 'admin';
+}
+
 interface UserContextType {
+  user: User | null;
   coins: number;
   library: string[];
   unlockedChapters: string[];
@@ -18,8 +27,17 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const initialCoins = 100;
 
+// Mock user data. In a real app, this would come from an auth provider.
+const mockUser: User = {
+  name: 'Pengguna Admin',
+  email: 'admin@novelku.com',
+  avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+  role: 'admin',
+};
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(mockUser);
   const [coins, setCoins] = useState<number>(initialCoins);
   const [library, setLibrary] = useState<string[]>([]);
   const [unlockedChapters, setUnlockedChapters] = useState<string[]>([]);
@@ -113,7 +131,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <UserContext.Provider value={{ coins, library, unlockedChapters, addToLibrary, removeFromLibrary, isNovelInLibrary, unlockChapter, isChapterUnlocked }}>
+    <UserContext.Provider value={{ user, coins, library, unlockedChapters, addToLibrary, removeFromLibrary, isNovelInLibrary, unlockChapter, isChapterUnlocked }}>
       {children}
     </UserContext.Provider>
   );

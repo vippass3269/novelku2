@@ -1,7 +1,7 @@
 
 "use client";
 
-import { novels, genres } from "@/lib/data";
+import { novels as initialNovels, genres } from "@/lib/data";
 import type { Novel } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,23 @@ import Link from "next/link";
 import { useState } from "react";
 import { EditNovelSheet } from "./_components/EditNovelSheet";
 import { AddNovelSheet } from "./_components/AddNovelSheet";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import { DeleteNovelDialog } from "./_components/DeleteNovelDialog";
 
 const genreMap = new Map(genres.map(g => [g.id, g.name]));
 
 export default function KelolaNovelPage() {
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [novels, setNovels] = useState<Novel[]>(initialNovels);
   const [selectedNovel, setSelectedNovel] = useState<Novel | null>(null);
+  const [novelToDelete, setNovelToDelete] = useState<Novel | null>(null);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+
+  const isAdmin = user?.role === 'admin';
 
   const formatViews = (views: number) => {
     return new Intl.NumberFormat('id-ID').format(views);
@@ -39,6 +49,31 @@ export default function KelolaNovelPage() {
   
   const handleAddClick = () => {
     setIsAddSheetOpen(true);
+  };
+
+  const handleDeleteClick = (novel: Novel) => {
+    if (!isAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Akses Ditolak",
+        description: "Anda tidak memiliki izin untuk menghapus novel.",
+      });
+      return;
+    }
+    setNovelToDelete(novel);
+    setIsDeleteAlertOpen(true);
+  };
+  
+  const confirmDelete = () => {
+    if (novelToDelete) {
+      setNovels(currentNovels => currentNovels.filter(n => n.id !== novelToDelete.id));
+      toast({
+        title: "Berhasil",
+        description: `Novel "${novelToDelete.title}" telah dihapus.`,
+      });
+    }
+    setNovelToDelete(null);
+    setIsDeleteAlertOpen(false);
   };
 
 
@@ -58,7 +93,7 @@ export default function KelolaNovelPage() {
               Tambah dan edit novel Anda
             </p>
           </div>
-          <Button size="lg" onClick={handleAddClick}>
+          <Button size="lg" onClick={handleAddClick} disabled={!isAdmin}>
             <Plus className="mr-2 h-5 w-5" />
             Tambah Novel
           </Button>
@@ -131,10 +166,10 @@ export default function KelolaNovelPage() {
                               <BookUp className="h-4 w-4" />
                             </Link>
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(novel)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(novel)} disabled={!isAdmin}>
                               <FilePenLine className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteClick(novel)} disabled={!isAdmin}>
                               <Trash2 className="h-4 w-4" />
                           </Button>
                       </div>
@@ -157,6 +192,15 @@ export default function KelolaNovelPage() {
           open={isEditSheetOpen}
           onOpenChange={setIsEditSheetOpen}
           novel={selectedNovel}
+        />
+      )}
+
+      {novelToDelete && (
+        <DeleteNovelDialog
+          open={isDeleteAlertOpen}
+          onOpenChange={setIsDeleteAlertOpen}
+          onConfirm={confirmDelete}
+          novelTitle={novelToDelete.title}
         />
       )}
     </>
