@@ -8,7 +8,6 @@ export interface Chapter {
   slug: string;
   title: string;
   content: string;
-  isLocked: boolean;
   cost: number;
 }
 
@@ -21,6 +20,10 @@ export interface Novel {
   coverImage: ImagePlaceholder;
   genreIds: string[];
   chapters: Chapter[];
+  stats: {
+    rating: number;
+    views: number;
+  };
 }
 
 export interface Genre {
@@ -33,6 +36,12 @@ export const genres: Genre[] = [
   { id: 'fantasi', slug: 'fantasi', name: 'Fantasi' },
   { id: 'romansa', slug: 'romansa', name: 'Romansa' },
   { id: 'misteri', slug: 'misteri', name: 'Misteri' },
+  { id: 'aksi', slug: 'aksi', name: 'Aksi' },
+  { id: 'petualangan', slug: 'petualangan', name: 'Petualangan' },
+  { id: 'sci-fi', slug: 'sci-fi', name: 'Sci-Fi' },
+  { id: 'horor', slug: 'horor', name: 'Horor' },
+  { id: 'komedi', slug: 'komedi', name: 'Komedi' },
+  { id: 'drama', slug: 'drama', name: 'Drama' },
 ];
 
 export const novels: Novel[] = [
@@ -44,11 +53,14 @@ export const novels: Novel[] = [
     description: 'Di sebuah dunia yang terbelah antara sihir dan teknologi, seorang gadis bernama Elara menemukan artefak kuno yang bisa mengubah takdir dunia. Ia harus berjuang melawan kekuatan gelap yang juga menginginkan artefak tersebut.',
     coverImage: imageMap.get('novel-cover-1')!,
     genreIds: ['fantasi'],
-    chapters: [
-      { id: 'gema-1', slug: 'bab-1', title: 'Bab 1: Penemuan Tak Terduga', content: 'Langit senja di kota Neo-Veridia selalu berwarna ungu kemerahan, sebuah pemandangan yang tak pernah gagal membuat Elara terpukau. Hari itu, saat sedang mengais barang bekas di Pasar Rongsokan, tangannya menyentuh sebuah kotak logam dingin yang berukir simbol-simbol aneh. Tanpa ia sadari, penemuan itu akan menjadi awal dari petualangan terbesar dalam hidupnya.', isLocked: false, cost: 0 },
-      { id: 'gema-2', slug: 'bab-2', title: 'Bab 2: Suara dari Masa Lalu', content: 'Kotak itu bergetar hebat di malam hari, memancarkan cahaya keemasan yang lembut. Sebuah suara berbisik di benak Elara, suara yang terdengar tua dan bijaksana, menceritakan tentang perang kuno dan sebuah kunci untuk mendamaikan dunia.', isLocked: true, cost: 10 },
-      { id: 'gema-3', slug: 'bab-3', title: 'Bab 3: Diburu Kegelapan', content: 'Kekuatan artefak itu tidak luput dari perhatian. Sosok-sosok berjubah gelap dari Ordo Obsidian mulai memburunya. Elara terpaksa melarikan diri dari satu-satunya rumah yang pernah ia kenal.', isLocked: true, cost: 10 },
-    ],
+    stats: { rating: 4.7, views: 567000 },
+    chapters: Array.from({ length: 15 }, (_, i) => ({
+      id: `gema-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: ${i === 0 ? 'Penemuan Tak Terduga' : i === 1 ? 'Suara dari Masa Lalu' : `Perjalanan Baru ${i-1}`}`,
+      content: `Ini adalah isi konten untuk bab ${i + 1} dari novel Gema di Ujung Senja. Setiap bab membawa Elara lebih dekat ke takdirnya, mengungkap lebih banyak rahasia tentang artefak kuno dan dunia yang terpecah. Perjalanan ini penuh dengan bahaya, persahabatan, dan pengkhianatan.`,
+      cost: i < 10 ? 0 : 10,
+    })),
   },
   {
     id: 'jejak-sang-pengembara',
@@ -58,10 +70,14 @@ export const novels: Novel[] = [
     description: 'Kisah seorang pengembara tanpa nama yang berkelana dari satu kerajaan ke kerajaan lain, meninggalkan jejak-jejak perubahan di setiap tempat yang ia singgahi. Siapakah dia sebenarnya dan apa tujuan dari perjalanannya?',
     coverImage: imageMap.get('novel-cover-2')!,
     genreIds: ['fantasi'],
-    chapters: [
-      { id: 'jejak-1', slug: 'bab-1', title: 'Bab 1: Tiba di Kerajaan Pasir', content: 'Seorang pria asing dengan mantel usang tiba di gerbang Kerajaan Azura, sebuah negeri yang kering kerontang di tengah gurun pasir. Ia tidak menyebutkan nama, hanya tatapan matanya yang setajam elang gurun.', isLocked: false, cost: 0 },
-      { id: 'jejak-2', slug: 'bab-2', title: 'Bab 2: Wabah Misterius', content: 'Kerajaan Azura sedang dilanda wabah yang membuat penduduknya tertidur lelap tanpa bisa dibangunkan. Sang pengembara menawarkan bantuan, dengan syarat ia diizinkan mengakses perpustakaan kuno istana.', isLocked: true, cost: 5 },
-    ],
+    stats: { rating: 4.9, views: 234000 },
+    chapters: Array.from({ length: 12 }, (_, i) => ({
+        id: `jejak-${i + 1}`,
+        slug: `bab-${i + 1}`,
+        title: `Bab ${i + 1}: ${i === 0 ? 'Tiba di Kerajaan Pasir' : `Teka-teki Baru ${i}`}`,
+        content: `Konten untuk bab ${i+1}. Sang pengembara melanjutkan perjalanannya, menghadapi tantangan baru dan mengungkap misteri yang lebih dalam di setiap kerajaan yang ia kunjungi.`,
+        cost: i < 10 ? 0 : 5,
+    })),
   },
   {
     id: 'bisikan-hutan-larangan',
@@ -71,10 +87,14 @@ export const novels: Novel[] = [
     description: 'Sebuah hutan yang dikabarkan terkutuk menyimpan rahasia kelam sebuah desa. Ketika adiknya tersesat di dalamnya, Rian nekat masuk, hanya untuk menemukan bahwa bisikan-bisikan di hutan itu lebih dari sekadar legenda.',
     coverImage: imageMap.get('novel-cover-3')!,
     genreIds: ['misteri', 'fantasi'],
-    chapters: [
-       { id: 'bisikan-1', slug: 'bab-1', title: 'Bab 1: Hutan yang Terlarang', content: 'Semua orang di Desa Cipta Asih tahu satu aturan: jangan pernah memasuki Hutan Arga. Rian menganggapnya takhayul, sampai adiknya, Maya, menghilang setelah bermain di tepi hutan.', isLocked: false, cost: 0 },
-       { id: 'bisikan-2', slug: 'bab-2', title: 'Bab 2: Melanggar Aturan', content: 'Mengabaikan peringatan para tetua, Rian melangkahkan kaki ke dalam kegelapan hutan. Udara terasa dingin dan suara-suara aneh mulai terdengar di antara pepohonan.', isLocked: true, cost: 10 },
-    ],
+    stats: { rating: 4.8, views: 125000 },
+    chapters: Array.from({ length: 20 }, (_, i) => ({
+      id: `bisikan-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: ${i === 0 ? 'Hutan yang Terlarang' : `Jejak yang Hilang ${i}`}`,
+      content: `Konten untuk bab ${i+1}. Rian semakin jauh masuk ke dalam hutan, di mana setiap pohon tampak mengawasinya dan setiap bisikan angin membawa pesan misterius.`,
+      cost: i < 10 ? 0 : 10,
+    })),
   },
   {
     id: 'serpihan-rindu',
@@ -84,10 +104,14 @@ export const novels: Novel[] = [
     description: 'Setelah lima tahun terpisah, takdir mempertemukan kembali Arka dan Laras di sebuah kafe kecil di sudut kota Praha. Namun, waktu telah mengubah banyak hal, dan keduanya harus menghadapi luka lama yang belum sembuh.',
     coverImage: imageMap.get('novel-cover-4')!,
     genreIds: ['romansa'],
-    chapters: [
-      { id: 'serpihan-1', slug: 'bab-1', title: 'Bab 1: Praha dan Kenangan', content: 'Lonceng kecil di pintu kafe berdentang, dan Laras mengangkat pandangannya dari buku. Jantungnya seakan berhenti berdetak. Pria yang baru saja masuk adalah Arka, cinta pertamanya yang menghilang tanpa kabar.', isLocked: false, cost: 0 },
-      { id: 'serpihan-2', slug: 'bab-2', title: 'Bab 2: Percakapan yang Canggung', content: 'Keduanya duduk berhadapan, secangkir kopi menjadi saksi bisu kecanggungan di antara mereka. "Apa kabarmu?" adalah kalimat pertama yang terucap setelah lima tahun hening.', isLocked: true, cost: 5 },
-    ],
+    stats: { rating: 4.6, views: 320000 },
+    chapters: Array.from({ length: 8 }, (_, i) => ({
+        id: `serpihan-${i + 1}`,
+        slug: `bab-${i + 1}`,
+        title: `Bab ${i + 1}: ${i === 0 ? 'Praha dan Kenangan' : `Kata yang Tak Terucap ${i}`}`,
+        content: `Konten untuk bab ${i+1}. Di tengah keindahan kota Praha, Arka dan Laras mencoba merangkai kembali serpihan-serpihan masa lalu mereka, meskipun tidak mudah.`,
+        cost: 0,
+    })),
   },
   {
     id: 'cinta-di-bawah-purnama',
@@ -97,9 +121,14 @@ export const novels: Novel[] = [
     description: 'Seorang pelukis jalanan bertemu dengan seorang pewaris kaya yang melarikan diri dari perjodohan. Pertemuan tak sengaja di malam bulan purnama membawa mereka pada sebuah kisah cinta yang mustahil dan penuh tantangan.',
     coverImage: imageMap.get('novel-cover-6')!,
     genreIds: ['romansa'],
-    chapters: [
-        { id: 'cinta-1', slug: 'bab-1', title: 'Bab 1: Malam Purnama', content: 'Di bawah sinar bulan purnama, Bima sedang menyelesaikan lukisan Jembatan Ampera saat seorang gadis dengan gaun mewah tiba-tiba duduk di sebelahnya, menangis tersedu-sedu.', isLocked: false, cost: 0 },
-    ],
+    stats: { rating: 4.5, views: 180000 },
+    chapters: Array.from({ length: 15 }, (_, i) => ({
+      id: `cinta-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: ${i === 0 ? 'Malam Purnama' : `Dunia yang Berbeda ${i}`}`,
+      content: `Konten untuk bab ${i+1}. Kisah cinta antara si miskin dan si kaya ini diuji oleh perbedaan status sosial dan tentangan keluarga.`,
+      cost: i < 10 ? 0 : 5,
+    })),
   },
   {
     id: 'konspirasi-ibukota',
@@ -109,8 +138,13 @@ export const novels: Novel[] = [
     description: 'Seorang jurnalis investigasi menemukan sebuah data yang mengarah pada konspirasi besar di lingkaran pejabat tinggi negara. Kini, hidupnya dalam bahaya dan ia harus berpacu dengan waktu untuk mengungkap kebenaran.',
     coverImage: imageMap.get('novel-cover-7')!,
     genreIds: ['misteri'],
-    chapters: [
-        { id: 'konspirasi-1', slug: 'bab-1', title: 'Bab 1: Flashdisk Berdarah', content: 'Sebuah flashdisk dilemparkan ke mobil Rian oleh seorang informan misterius, beberapa detik sebelum informan itu tewas dalam sebuah kecelakaan yang direkayasa. Rian tahu, isi flashdisk ini sangat berbahaya.', isLocked: false, cost: 0 },
-    ],
+    stats: { rating: 4.8, views: 450000 },
+    chapters: Array.from({ length: 25 }, (_, i) => ({
+      id: `konspirasi-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: ${i === 0 ? 'Flashdisk Berdarah' : `Bayangan Mengintai ${i}`}`,
+      content: `Konten untuk bab ${i+1}. Dengan setiap data yang ia buka, Rian semakin terjerat dalam jaringan konspirasi yang mengancam nyawanya dan keamanan negara.`,
+      cost: i < 10 ? 0 : 15,
+    })),
   },
 ];

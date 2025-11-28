@@ -1,76 +1,129 @@
 import { genres, novels } from '@/lib/data';
 import { NovelCard } from '@/components/novel/NovelCard';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import { Star, Eye, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
-  const featuredNovel = novels[0];
+  const featuredNovels = novels.slice(0, 3);
+  const allNovels = novels.slice(3);
+  const popularNovels = [...novels].sort((a, b) => b.stats.views - a.stats.views).slice(0, 5);
 
   return (
-    <div className="container mx-auto">
-      {/* Hero Section */}
-      <section className="relative w-full h-[60vh] md:h-[70vh] my-8 rounded-2xl overflow-hidden">
-        <Image
-          src={featuredNovel.coverImage.imageUrl}
-          alt={`Cover of ${featuredNovel.title}`}
-          fill
-          data-ai-hint={featuredNovel.coverImage.imageHint}
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-        <div className="absolute inset-0 flex items-end p-8 md:p-12">
-          <div className="max-w-xl text-white">
-            <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground mb-4 drop-shadow-lg">
-              {featuredNovel.title}
-            </h1>
-            <p className="text-lg text-foreground/80 mb-6 drop-shadow-md">
-              {featuredNovel.description}
-            </p>
-            <Link href={`/novel/${featuredNovel.slug}`}>
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                Mulai Membaca <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+    <div className="w-full">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="text-center py-12 md:py-20">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter mb-4">
+            Temukan Cerita <span className="text-primary">Favoritmu</span>
+          </h1>
+          <p className="max-w-2xl mx-auto text-muted-foreground text-lg">
+            Ribuan novel web dari berbagai genre. Baca cerita yang memikat imajinasimu.
+          </p>
+        </section>
 
-      {/* Genre Sections */}
-      <div className="space-y-12 my-12">
-        {genres.map((genre) => {
-          const novelsInGenre = novels.filter((novel) =>
-            novel.genreIds.includes(genre.id)
-          );
-          if (novelsInGenre.length === 0) return null;
-
-          return (
-            <section key={genre.id}>
-              <h2 className="text-3xl font-bold font-headline mb-6">{genre.name}</h2>
-              <div className="relative">
-                <ScrollArea>
-                  <div className="flex space-x-6 pb-4">
-                    {novelsInGenre.map((novel) => (
-                      <NovelCard
-                        key={novel.id}
-                        novel={novel}
-                        className="w-[200px]"
-                        width={200}
-                        height={300}
+        <section className="mb-12">
+          <Carousel opts={{ loop: true }}>
+            <CarouselContent>
+              {featuredNovels.map((novel) => (
+                <CarouselItem key={novel.id} className="md:basis-1/2 lg:basis-1/3">
+                  <Link href={`/novel/${novel.slug}`}>
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden group">
+                      <Image
+                        src={novel.coverImage.imageUrl}
+                        alt={`Cover of ${novel.title}`}
+                        fill
+                        data-ai-hint={novel.coverImage.imageHint}
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                    ))}
-                  </div>
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                      <div className="absolute bottom-0 left-0 p-6 text-white">
+                        <Badge variant="secondary" className="mb-2 bg-green-500 text-white border-none">Berlanjut</Badge>
+                        <h2 className="text-2xl font-bold">{novel.title}</h2>
+                        <p className="text-sm text-white/80 mt-1 line-clamp-2">{novel.description}</p>
+                        <div className="flex items-center gap-4 text-sm mt-3 text-white/90">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-400" />
+                            <span>{novel.stats.rating.toFixed(1)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-4 h-4" />
+                            <span>{(novel.stats.views / 1000).toFixed(0)}k</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <BookOpen className="w-4 h-4" />
+                            <span>{novel.chapters.length} bab</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </section>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-9">
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold mb-4">Jelajahi Genre</h2>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="default" size="sm" className="bg-primary rounded-full">Semua</Button>
+                {genres.map((genre) => (
+                  <Button key={genre.id} variant="secondary" size="sm" className="rounded-full">
+                    {genre.name}
+                  </Button>
+                ))}
               </div>
-              <Separator className="my-8" />
             </section>
-          );
-        })}
+
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Novel Semua</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-8">
+                {allNovels.map((novel) => (
+                  <NovelCard key={novel.id} novel={novel} width={250} height={375} />
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <aside className="lg:col-span-3">
+            <div className="sticky top-24 bg-secondary/30 p-6 rounded-2xl">
+              <h3 className="text-xl font-bold mb-4">Populer</h3>
+              <div className="space-y-4">
+                {popularNovels.map((novel, index) => (
+                  <Link href={`/novel/${novel.slug}`} key={novel.id}>
+                    <div className="flex items-center gap-4 group">
+                      <div className="text-2xl font-bold text-muted-foreground w-8 text-center">{index + 1}</div>
+                      <Image
+                        src={novel.coverImage.imageUrl}
+                        alt={`Cover of ${novel.title}`}
+                        width={48}
+                        height={64}
+                        data-ai-hint={novel.coverImage.imageHint}
+                        className="rounded-md object-cover"
+                      />
+                      <div>
+                        <h4 className="font-semibold group-hover:text-primary transition-colors">{novel.title}</h4>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                          <Star className="w-3 h-3 text-yellow-400" />
+                          <span>{novel.stats.rating.toFixed(1)}</span>
+                          <span>&middot;</span>
+                          <span>{novel.chapters.length} ch</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

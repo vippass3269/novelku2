@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import AddToLibraryButton from "./_components/AddToLibraryButton";
 import ChapterList from "./_components/ChapterList";
+import { Badge } from "@/components/ui/badge";
 
 export async function generateStaticParams() {
   return novels.map((novel) => ({
@@ -36,22 +37,22 @@ export default function NovelPage({ params }: { params: { slug: string } }) {
           </div>
         </div>
         <div className="md:col-span-8 lg:col-span-9">
-          <h1 className="text-4xl md:text-5xl font-bold font-headline mb-2">{novel.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">{novel.title}</h1>
           <p className="text-xl text-muted-foreground mb-6">oleh {novel.author}</p>
           <div className="flex flex-wrap gap-2 mb-6">
             {novel.genreIds.map(id => (
-                <span key={id} className="text-xs font-semibold inline-block py-1 px-2.5 uppercase rounded-full text-primary-foreground bg-primary/80">
+                <Badge key={id} variant="secondary">
                     {id}
-                </span>
+                </Badge>
             ))}
           </div>
 
           <p className="text-lg leading-relaxed text-foreground/80 mb-8">{novel.description}</p>
           
-          <Separator />
+          <Separator className="bg-border/50" />
 
           <div className="mt-8">
-            <h2 className="text-3xl font-bold font-headline mb-4">Daftar Bab</h2>
+            <h2 className="text-3xl font-bold mb-4">Daftar Bab</h2>
             <ChapterList novel={novel} />
           </div>
         </div>

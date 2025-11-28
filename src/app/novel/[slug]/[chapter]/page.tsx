@@ -31,14 +31,15 @@ export default function ChapterPage({ params }: { params: { slug: string; chapte
   const chapter = novel.chapters[chapterIndex];
   const prevChapter = chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : null;
   const nextChapter = chapterIndex < novel.chapters.length - 1 ? novel.chapters[chapterIndex + 1] : null;
-
-  const isUnlocked = !chapter.isLocked || isChapterUnlocked(chapter.id);
+  
+  const isLocked = chapterIndex >= 10 && chapter.cost > 0;
+  const isUnlocked = !isLocked || isChapterUnlocked(chapter.id);
   
   if (!isClient) {
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-            <Skeleton className="h-12 w-3/4 mb-4" />
-            <Skeleton className="h-8 w-1/2 mb-12" />
+            <Skeleton className="h-12 w-3/4 mb-4 mx-auto" />
+            <Skeleton className="h-8 w-1/2 mb-12 mx-auto" />
             <div className="space-y-4">
                 <Skeleton className="h-6 w-full" />
                 <Skeleton className="h-6 w-full" />
@@ -51,10 +52,10 @@ export default function ChapterPage({ params }: { params: { slug: string; chapte
 
   if (!isUnlocked) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
         <Lock className="w-16 h-16 text-destructive mb-4" />
         <h1 className="text-3xl font-bold mb-2">Bab Terkunci</h1>
-        <p className="text-muted-foreground mb-6">Anda harus membuka bab ini untuk dapat membacanya.</p>
+        <p className="text-muted-foreground mb-6 max-w-md">Anda harus membuka bab ini untuk dapat membacanya. Bab 1-10 gratis, bab selanjutnya memerlukan koin.</p>
         <Button onClick={() => router.push(`/novel/${novel.slug}`)}>Kembali ke Daftar Bab</Button>
       </div>
     );
@@ -62,10 +63,10 @@ export default function ChapterPage({ params }: { params: { slug: string; chapte
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-      <h1 className="text-4xl md:text-5xl font-bold font-headline text-center mb-4">{chapter.title}</h1>
+      <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">{chapter.title}</h1>
       <p className="text-center text-muted-foreground mb-12">{novel.title}</p>
       
-      <div className="prose prose-invert prose-lg max-w-none text-foreground/90 prose-p:leading-loose">
+      <div className="text-lg leading-relaxed text-foreground/90 space-y-6 text-justify">
         {chapter.content.split('\n').map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}

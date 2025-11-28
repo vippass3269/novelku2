@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserContextType {
   coins: number;
@@ -16,9 +16,10 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const initialCoins = 50;
+const initialCoins = 100;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { toast } = useToast();
   const [coins, setCoins] = useState<number>(initialCoins);
   const [library, setLibrary] = useState<string[]>([]);
   const [unlockedChapters, setUnlockedChapters] = useState<string[]>([]);
@@ -92,9 +93,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const unlockChapter = (chapterId: string, cost: number) => {
     if (coins >= cost) {
-      setCoins((prevCoins) => prevCoins - cost);
+      const newCoinTotal = coins - cost;
+      setCoins(newCoinTotal);
       setUnlockedChapters((prev) => [...prev, chapterId]);
-      toast({ title: "Berhasil!", description: `Bab berhasil dibuka. Sisa koin Anda: ${coins - cost}` });
+      toast({ title: "Berhasil!", description: `Bab berhasil dibuka. Sisa koin Anda: ${newCoinTotal}` });
       return true;
     } else {
       toast({ title: "Gagal", description: "Koin tidak cukup untuk membuka bab ini.", variant: "destructive" });

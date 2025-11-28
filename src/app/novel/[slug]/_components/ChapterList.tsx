@@ -5,17 +5,17 @@ import Link from "next/link";
 import { type Novel, type Chapter } from "@/lib/data";
 import { useUser } from "@/contexts/UserContext";
 import { UnlockChapterDialog } from "@/components/novel/UnlockChapterDialog";
-import { Lock, Unlock, ChevronRight } from "lucide-react";
+import { Lock, Unlock, ChevronRight, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ChapterList({ novel }: { novel: Novel }) {
-  const { unlockChapter, isChapterUnlocked } = useUser();
+  const { unlockChapter, isChapterUnlocked, coins } = useUser();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
 
-  const handleUnlockClick = (chapter: Chapter) => {
-    if (!chapter.isLocked || isChapterUnlocked(chapter.id)) {
-      // This case should be handled by the Link, but as a fallback.
+  const handleUnlockClick = (chapter: Chapter, chapterIndex: number) => {
+    const isLocked = chapterIndex >= 10 && chapter.cost > 0;
+    if (!isLocked || isChapterUnlocked(chapter.id)) {
       return;
     }
     setSelectedChapter(chapter);
@@ -32,10 +32,11 @@ export default function ChapterList({ novel }: { novel: Novel }) {
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden">
-        <ul className="divide-y">
-          {novel.chapters.map((chapter) => {
-            const unlocked = !chapter.isLocked || isChapterUnlocked(chapter.id);
+      <div className="border rounded-lg overflow-hidden bg-secondary/20">
+        <ul className="divide-y divide-border">
+          {novel.chapters.map((chapter, index) => {
+            const isLocked = index >= 10 && chapter.cost > 0;
+            const unlocked = !isLocked || isChapterUnlocked(chapter.id);
             const ChapterLinkWrapper = unlocked ? Link : 'div';
             const props = unlocked ? { href: `/novel/${novel.slug}/${chapter.slug}` } : {};
 
@@ -43,20 +44,27 @@ export default function ChapterList({ novel }: { novel: Novel }) {
               <li key={chapter.id}>
                 <ChapterLinkWrapper {...props}>
                   <div
-                    onClick={() => !unlocked && handleUnlockClick(chapter)}
+                    onClick={() => !unlocked && handleUnlockClick(chapter, index)}
                     className={cn(
                       "flex items-center justify-between p-4 transition-colors",
-                      unlocked ? "hover:bg-accent/10 cursor-pointer" : "cursor-pointer hover:bg-destructive/10"
+                      unlocked ? "hover:bg-accent/50 cursor-pointer" : "cursor-pointer hover:bg-destructive/10"
                     )}
                   >
-                    <span className="font-medium">{chapter.title}</span>
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-3">
+                       {unlocked && isLocked ? (
+                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      ) : (
+                         <span className="text-muted-foreground w-5 text-center flex-shrink-0">{index + 1}</span>
+                      )}
+                      <span className="font-medium">{chapter.title}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
                       {unlocked ? (
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
                       ) : (
                         <>
-                          <span className="text-accent font-semibold">{chapter.cost} Koin</span>
-                          <Lock className="h-5 w-5 text-accent" />
+                          <span className="text-primary font-semibold">{chapter.cost} Koin</span>
+                          <Lock className="h-5 w-5 text-primary" />
                         </>
                       )}
                     </div>
@@ -75,6 +83,7 @@ export default function ChapterList({ novel }: { novel: Novel }) {
           onConfirm={handleConfirmUnlock}
           chapterTitle={selectedChapter.title}
           cost={selectedChapter.cost}
+          userCoins={coins}
         />
       )}
     </>
