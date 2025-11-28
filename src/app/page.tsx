@@ -36,7 +36,7 @@ export default function Home() {
 
   }, []);
 
-  const featuredNovels = novels.filter(n => n.isFeatured);
+  const featuredNovels = novels.filter(n => n.isFeatured).sort((a, b) => a.id.localeCompare(b.id));
   const allNovels = novels.filter(n => !n.isFeatured);
   const popularNovels = [...novels].sort((a, b) => b.stats.views - a.stats.views).slice(0, 5);
 
@@ -55,7 +55,7 @@ export default function Home() {
         <section className="mb-12">
           <Carousel 
             opts={{ loop: true }} 
-            className="relative w-full max-w-6xl mx-auto"
+            className="w-full max-w-6xl mx-auto"
           >
             <CarouselContent>
               {featuredNovels.map((novel) => (
@@ -94,8 +94,8 @@ export default function Home() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-[-1rem] top-1/2 -translate-y-1/2 z-10" />
-            <CarouselNext className="absolute right-[-1rem] top-1/2 -translate-y-1/2 z-10" />
+            <CarouselPrevious className="absolute left-[-1rem] md:left-2 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute right-[-1rem] md:right-2 top-1/2 -translate-y-1/2 z-10" />
           </Carousel>
         </section>
       </div>
