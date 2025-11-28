@@ -77,6 +77,12 @@ export default function Header() {
                               <span>Manajemen Penulis</span>
                           </Link>
                       </DropdownMenuItem>
+                       <DropdownMenuItem asChild>
+                           <Link href="/admin/users">
+                              <Users className="mr-2 h-4 w-4" />
+                              <span>Manajemen Pengguna</span>
+                          </Link>
+                      </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
             )}
