@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert, Coins } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -107,6 +107,7 @@ export default function KelolaNovelPage() {
                   <TableHead className="w-[40%] pl-6">Novel</TableHead>
                   <TableHead>Genre</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Tipe</TableHead>
                   <TableHead className="text-center">Chapter</TableHead>
                   <TableHead className="text-right">Views</TableHead>
                   <TableHead className="text-center pr-6">Aksi</TableHead>
@@ -152,6 +153,24 @@ export default function KelolaNovelPage() {
                       <Badge variant={novel.status === 'ongoing' ? 'secondary' : 'default'} className={novel.status === 'ongoing' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}>
                         {novel.status === "ongoing" ? "Berlanjut" : "Tamat"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                       <Badge
+                        variant="outline"
+                        className={
+                          novel.isFree
+                            ? "border-green-500/50 text-green-400"
+                            : "border-primary/50 text-primary"
+                        }
+                      >
+                         <div className="flex items-center gap-1">
+                            {novel.isFree ? (
+                                <>Gratis</>
+                            ) : (
+                                <><Coins className="h-3 w-3" /> Berbayar</>
+                            )}
+                         </div>
+                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
                       {novel.chapters.length}
