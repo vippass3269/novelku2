@@ -19,6 +19,8 @@ interface UserContextType {
   coins: number;
   library: string[];
   unlockedChapters: string[];
+  login: (role: 'admin' | 'writer' | 'user') => void;
+  logout: () => void;
   addToLibrary: (novelSlug: string) => void;
   removeFromLibrary: (novelSlug: string) => void;
   isNovelInLibrary: (novelSlug: string) => boolean;
@@ -30,12 +32,14 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const initialCoins = 100;
 
-// Mock user data. In a real app, this would come from an auth provider.
-const mockUser: User = initialUsers.find(u => u.role === 'admin')!;
+const mockAdmin: User = initialUsers.find(u => u.role === 'admin')!;
+const mockWriter: User = initialUsers.find(u => u.role === 'writer' && u.verificationStatus === 'approved')!;
+const mockUser: User = initialUsers.find(u => u.role === 'user')!;
+
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(mockUser);
+  const [user, setUser] = useState<User | null>(null);
   const [coins, setCoins] = useState<number>(initialCoins);
   const [library, setLibrary] = useState<string[]>([]);
   const [unlockedChapters, setUnlockedChapters] = useState<string[]>([]);
@@ -46,25 +50,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const storedCoins = localStorage.getItem('novelku_coins');
       const storedLibrary = localStorage.getItem('novelku_library');
       const storedUnlockedChapters = localStorage.getItem('novelku_unlocked_chapters');
+      const storedUser = localStorage.getItem('novelku_user');
 
-      if (storedCoins) {
-        setCoins(JSON.parse(storedCoins));
-      } else {
-        setCoins(initialCoins);
-      }
+      if (storedCoins) setCoins(JSON.parse(storedCoins));
+      else setCoins(initialCoins);
 
-      if (storedLibrary) {
-        setLibrary(JSON.parse(storedLibrary));
-      }
+      if (storedLibrary) setLibrary(JSON.parse(storedLibrary));
+      if (storedUnlockedChapters) setUnlockedChapters(JSON.parse(storedUnlockedChapters));
+      if (storedUser) setUser(JSON.parse(storedUser));
 
-      if (storedUnlockedChapters) {
-        setUnlockedChapters(JSON.parse(storedUnlockedChapters));
-      }
     } catch (error) {
       console.error("Failed to read from localStorage", error);
       setCoins(initialCoins);
       setLibrary([]);
       setUnlockedChapters([]);
+      setUser(null);
     } finally {
         setIsInitialized(true);
     }
@@ -76,14 +76,37 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             localStorage.setItem('novelku_coins', JSON.stringify(coins));
             localStorage.setItem('novelku_library', JSON.stringify(library));
             localStorage.setItem('novelku_unlocked_chapters', JSON.stringify(unlockedChapters));
+            if (user) {
+                localStorage.setItem('novelku_user', JSON.stringify(user));
+            } else {
+                localStorage.removeItem('novelku_user');
+            }
         } catch (error) {
             console.error("Failed to write to localStorage", error);
         }
     }
-  }, [coins, library, unlockedChapters, isInitialized]);
+  }, [coins, library, unlockedChapters, user, isInitialized]);
   
+  const login = (role: 'admin' | 'writer' | 'user' = 'admin') => {
+      let userToLogin;
+      if (role === 'admin') userToLogin = mockAdmin;
+      if (role === 'writer') userToLogin = mockWriter;
+      if (role === 'user') userToLogin = mockUser;
+      setUser(userToLogin || mockAdmin);
+      toast({ title: "Login Berhasil", description: `Selamat datang kembali, ${userToLogin?.name}!`})
+  }
+
+  const logout = () => {
+      setUser(null);
+      toast({ title: "Logout Berhasil", description: "Anda telah keluar."})
+  }
+
 
   const addToLibrary = (novelSlug: string) => {
+    if (!user) {
+        toast({ title: "Harap Login", description: "Anda harus login untuk menambah ke pustaka.", variant: "destructive"});
+        return;
+    }
     setLibrary((prevLibrary) => {
       if (!prevLibrary.includes(novelSlug)) {
         toast({ title: "Berhasil", description: "Novel ditambahkan ke pustaka." });
@@ -94,6 +117,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromLibrary = (novelSlug: string) => {
+     if (!user) {
+        toast({ title: "Harap Login", description: "Anda harus login untuk menghapus dari pustaka.", variant: "destructive"});
+        return;
+    }
     setLibrary((prevLibrary) => {
       if (prevLibrary.includes(novelSlug)) {
         toast({ title: "Berhasil", description: "Novel dihapus dari pustaka." });
@@ -108,6 +135,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const unlockChapter = (chapterId: string, cost: number) => {
+     if (!user) {
+        toast({ title: "Harap Login", description: "Anda harus login untuk membuka chapter.", variant: "destructive"});
+        return false;
+    }
     if (coins >= cost) {
       const newCoinTotal = coins - cost;
       setCoins(newCoinTotal);
@@ -129,7 +160,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <UserContext.Provider value={{ user, coins, library, unlockedChapters, addToLibrary, removeFromLibrary, isNovelInLibrary, unlockChapter, isChapterUnlocked }}>
+    <UserContext.Provider value={{ user, coins, library, unlockedChapters, login, logout, addToLibrary, removeFromLibrary, isNovelInLibrary, unlockChapter, isChapterUnlocked }}>
       {children}
     </UserContext.Provider>
   );

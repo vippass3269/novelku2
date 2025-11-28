@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users, Image as ImageIcon, MessageSquare } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users, Image as ImageIcon, MessageSquare, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -13,13 +13,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { TopUpDialog } from "../top-up/TopUpDialog";
 
 export default function Header() {
-  const { user, coins } = useUser();
+  const { user, coins, login, logout } = useUser();
   const isLoggedIn = !!user;
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const isAdmin = user?.role === 'admin';
@@ -165,7 +169,7 @@ export default function Header() {
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Keluar</span>
                     </DropdownMenuItem>
@@ -173,10 +177,30 @@ export default function Header() {
                 </DropdownMenu>
               </>
             ) : (
-              <Button>
-                <LogOut className="mr-2 h-4 w-4" />
-                Masuk
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Masuk
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                    <DropdownMenuLabel>Masuk sebagai</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => login('admin')}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => login('writer')}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Penulis</span>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => login('user')}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Pembaca</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
