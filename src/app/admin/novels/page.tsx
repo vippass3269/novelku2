@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert, Coins } from "lucide-react";
+import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert, Coins, CheckCircle, Hourglass } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -63,8 +63,11 @@ export default function KelolaNovelPage() {
     window.dispatchEvent(new Event('storage'));
   }
 
-
   const isAdmin = user?.role === 'admin';
+  const isWriter = user?.role === 'writer';
+  const canManage = isAdmin || isWriter;
+
+  const userNovels = novels.filter(novel => isAdmin || novel.authorId === user?.id);
 
   const formatViews = (views: number) => {
     return new Intl.NumberFormat('id-ID').format(views);
@@ -80,16 +83,16 @@ export default function KelolaNovelPage() {
   };
 
   const handleDeleteClick = (novel: Novel) => {
-    if (!isAdmin) {
+    if (!isAdmin && novel.authorId !== user?.id) {
       toast({
         variant: "destructive",
         title: "Akses Ditolak",
-        description: "Anda tidak memiliki izin untuk menghapus novel.",
+        description: "Anda tidak memiliki izin untuk menghapus novel ini.",
       });
       return;
     }
     setNovelToDelete(novel);
-    setIsDeleteAlertOpen(true);
+setIsDeleteAlertOpen(true);
   };
   
   const confirmDelete = () => {
@@ -106,11 +109,13 @@ export default function KelolaNovelPage() {
   };
 
   const handleAddNovel = (data: any) => {
+    if (!user) return;
     const newNovel: Novel = {
       id: `novel-${Date.now()}`,
       slug: data.title.toLowerCase().replace(/\s+/g, '-'),
       title: data.title,
       author: data.author,
+      authorId: user.id,
       description: data.description,
       coverImage: {
           id: 'new-cover',
@@ -126,13 +131,13 @@ export default function KelolaNovelPage() {
       },
       isFree: data.isFree,
       isR18: data.isR18,
-      isFeatured: data.isFeatured,
-      status: data.status,
+      isFeatured: false, // Only admin can feature
+      status: isAdmin ? 'ongoing' : 'pending',
     };
     updateNovelsInStorage([newNovel, ...novels]);
     toast({
         title: "Novel Ditambahkan",
-        description: `Novel "${data.title}" berhasil dibuat.`,
+        description: `Novel "${data.title}" berhasil dibuat dan menunggu persetujuan admin.`,
     });
   }
 
@@ -151,7 +156,7 @@ export default function KelolaNovelPage() {
                 status: data.status,
                 isFree: data.isFree,
                 isR18: data.isR18,
-                isFeatured: data.isFeatured,
+                isFeatured: isAdmin ? data.isFeatured : novel.isFeatured,
             }
         }
         return novel;
@@ -163,6 +168,29 @@ export default function KelolaNovelPage() {
         title: "Novel Diperbarui",
         description: `Novel "${data.title}" berhasil diperbarui.`,
     });
+  }
+  
+  const handleApproveNovel = (novelId: string) => {
+    const updatedNovels = novels.map(novel => {
+        if(novel.id === novelId) {
+            return { ...novel, status: 'ongoing' };
+        }
+        return novel;
+    });
+    updateNovelsInStorage(updatedNovels);
+    toast({ title: "Novel Disetujui", description: "Novel sekarang sudah tayang." });
+  }
+
+  if (!canManage) {
+    return (
+        <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-3xl font-bold">Akses Ditolak</h1>
+            <p className="text-muted-foreground mt-2">Anda harus menjadi Admin atau Penulis untuk mengakses halaman ini.</p>
+             <Button asChild className="mt-6">
+                <Link href="/register/writer">Daftar jadi Penulis</Link>
+            </Button>
+        </div>
+    )
   }
 
 
@@ -179,10 +207,10 @@ export default function KelolaNovelPage() {
               </Button>
             <h1 className="text-3xl md:text-4xl font-bold">Kelola Novel</h1>
             <p className="text-muted-foreground mt-1">
-              Tambah dan edit novel Anda
+              {isAdmin ? "Kelola semua novel di platform." : "Kelola novel yang Anda tulis."}
             </p>
           </div>
-          <Button size="lg" onClick={handleAddClick} disabled={!isAdmin}>
+          <Button size="lg" onClick={handleAddClick}>
             <Plus className="mr-2 h-5 w-5" />
             Tambah Novel
           </Button>
@@ -203,8 +231,8 @@ export default function KelolaNovelPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {novels.map((novel) => (
-                  <TableRow key={novel.id}>
+                {userNovels.map((novel) => (
+                  <TableRow key={novel.id} className={novel.status === 'pending' ? 'bg-yellow-950/50' : ''}>
                     <TableCell className="pl-6 font-medium">
                       <div className="flex items-center gap-4">
                         <Image
@@ -239,9 +267,9 @@ export default function KelolaNovelPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={novel.status === 'ongoing' ? 'secondary' : 'default'} className={novel.status === 'ongoing' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}>
-                        {novel.status === "ongoing" ? "Berlanjut" : "Tamat"}
-                      </Badge>
+                      {novel.status === 'ongoing' && <Badge variant="secondary" className={'bg-green-500/10 text-green-400 border-green-500/20'}>Berlanjut</Badge>}
+                      {novel.status === 'completed' && <Badge variant="default" className={'bg-blue-500/10 text-blue-400 border-blue-500/20'}>Tamat</Badge>}
+                      {novel.status === 'pending' && <Badge variant="outline" className="text-yellow-400 border-yellow-400/50"><Hourglass className="h-3 w-3 mr-1.5" />Menunggu</Badge>}
                     </TableCell>
                     <TableCell>
                        <Badge
@@ -268,16 +296,21 @@ export default function KelolaNovelPage() {
                       {formatViews(novel.stats.views)}
                     </TableCell>
                     <TableCell className="text-center pr-6">
-                      <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-1">
+                          {isAdmin && novel.status === 'pending' && (
+                            <Button variant="ghost" size="sm" className="h-8 text-green-400 hover:text-green-400 hover:bg-green-950/50" onClick={() => handleApproveNovel(novel.id)}>
+                                <CheckCircle className="h-4 w-4 mr-2" /> Setujui
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                             <Link href={`/admin/novels/${novel.slug}`}>
                               <BookUp className="h-4 w-4" />
                             </Link>
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(novel)} disabled={!isAdmin}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(novel)} disabled={!isAdmin && novel.authorId !== user?.id}>
                               <FilePenLine className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteClick(novel)} disabled={!isAdmin}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteClick(novel)} disabled={!isAdmin && novel.authorId !== user?.id}>
                               <Trash2 className="h-4 w-4" />
                           </Button>
                       </div>

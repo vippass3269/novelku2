@@ -37,8 +37,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { X, Image as ImageIcon } from "lucide-react";
+import { X, Image as ImageIcon, ShieldAlert } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUser } from "@/contexts/UserContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Judul novel harus diisi."),
@@ -47,7 +48,7 @@ const formSchema = z.object({
   coverUrl: z.string().url("URL gambar tidak valid.").or(z.literal("")),
   genreIds: z.array(z.string()).min(1, "Pilih minimal satu genre."),
   tags: z.array(z.string()),
-  status: z.enum(["ongoing", "completed"]),
+  status: z.enum(["ongoing", "completed", "pending"]),
   freeChapters: z.coerce.number().min(0),
   coinCost: z.coerce.number().min(0),
   isFree: z.boolean(),
@@ -65,6 +66,8 @@ interface EditNovelSheetProps {
 }
 
 export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelSheetProps) {
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -79,6 +82,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
   const coverUrl = form.watch("coverUrl");
   const tags = form.watch("tags") || [];
   const isFree = form.watch("isFree");
+  const genreIds = form.watch("genreIds");
 
   useEffect(() => {
     if (open && novel) {
@@ -108,6 +112,11 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
     }
   }, [isFree, form]);
 
+  useEffect(() => {
+    if (genreIds?.includes('r18')) {
+        form.setValue("isR18", true);
+    }
+  }, [genreIds, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -227,7 +236,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                   <FormItem>
                     <FormLabel>Nama Penulis *</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={!isAdmin} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -261,15 +270,17 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                             <Button
                                 key={genre.id}
                                 type="button"
-                                variant={field.value.includes(genre.id) ? "default" : "outline"}
+                                variant={field.value?.includes(genre.id) ? "default" : "outline"}
                                 onClick={() => {
-                                    const newValue = field.value.includes(genre.id)
-                                    ? field.value.filter((id) => id !== genre.id)
-                                    : [...field.value, genre.id];
+                                    const value = field.value || [];
+                                    const newValue = value.includes(genre.id)
+                                    ? value.filter((id) => id !== genre.id)
+                                    : [...value, genre.id];
                                     field.onChange(newValue);
                                 }}
-                                className="rounded-full"
+                                className={`rounded-full ${genre.id === 'r18' && 'flex items-center gap-1.5'}`}
                                 >
+                                {genre.id === 'r18' && <ShieldAlert className="w-3.5 h-3.5" />}
                                 {genre.name}
                             </Button>
                         ))}
@@ -321,8 +332,8 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                 )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-               <FormField
+            {isAdmin && (
+                 <FormField
                   control={form.control}
                   name="status"
                   render={({ field }) => (
@@ -337,12 +348,16 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                             <SelectContent>
                                 <SelectItem value="ongoing">Berlanjut</SelectItem>
                                 <SelectItem value="completed">Tamat</SelectItem>
+                                <SelectItem value="pending">Menunggu</SelectItem>
                             </SelectContent>
                         </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+            )}
+            
+            <div className="grid grid-cols-2 gap-4">
                  <FormField
                   control={form.control}
                   name="freeChapters"
@@ -356,24 +371,22 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                     </FormItem>
                   )}
                 />
+                <FormField
+                    control={form.control}
+                    name="coinCost"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Harga Koin per Chapter</FormLabel>
+                        <FormControl>
+                        <Input type="number" {...field} disabled={isFree} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
             </div>
 
-             <FormField
-                control={form.control}
-                name="coinCost"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Harga Koin per Chapter</FormLabel>
-                    <FormControl>
-                    <Input type="number" {...field} disabled={isFree} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-
             <div className="space-y-4">
-                
                 <FormField
                     control={form.control}
                     name="isR18"
@@ -391,23 +404,25 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="isFeatured"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Tampilkan di Beranda</FormLabel>
-                            <FormDescription>
-                            Novel akan muncul di bagian unggulan.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
+                {isAdmin && (
+                    <FormField
+                        control={form.control}
+                        name="isFeatured"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <FormLabel className="text-base">Tampilkan di Beranda</FormLabel>
+                                <FormDescription>
+                                Novel akan muncul di bagian unggulan.
+                                </FormDescription>
+                            </div>
+                            <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                )}
             </div>
             
           </form>

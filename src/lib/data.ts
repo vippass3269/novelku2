@@ -17,6 +17,7 @@ export interface Novel {
   slug: string;
   title: string;
   author: string;
+  authorId: string;
   description: string;
   coverImage: ImagePlaceholder;
   genreIds: string[];
@@ -28,7 +29,7 @@ export interface Novel {
   isFree: boolean;
   isR18: boolean;
   isFeatured: boolean;
-  status: 'ongoing' | 'completed';
+  status: 'ongoing' | 'completed' | 'pending';
 }
 
 export interface Genre {
@@ -58,13 +59,14 @@ export const novels: Novel[] = [
     slug: 'malam-panas-di-kota-jakarta',
     title: 'Malam Panas di Kota Jakarta',
     author: 'Dewi Malam',
+    authorId: 'user-writer-002',
     description: 'Sebuah kisah romansa panas di tengah gemerlapnya kehidupan malam Jakarta. Pertemuan tak terduga yang mengubah segalanya.',
     coverImage: imageMap.get('novel-cover-8')!,
     genreIds: ['r18', 'romansa'],
     stats: { rating: 4.9, views: 156002 },
     isFree: false,
     isR18: true,
-    isFeatured: false,
+    isFeatured: true,
     status: 'ongoing',
     chapters: Array.from({ length: 1 }, (_, i) => ({
       id: `malam-panas-${i + 1}`,
@@ -79,6 +81,7 @@ export const novels: Novel[] = [
     slug: 'sang-raja-iblis-terlahir-kembali',
     title: 'Sang Raja Iblis Terlahir Kembali',
     author: 'Pendekar Langit',
+    authorId: 'user-admin-001',
     description: 'Raja Iblis yang dikalahkan ribuan tahun lalu, kini bereinkarnasi ke dalam tubuh seorang pemuda biasa. Akankah ia mengulang takdirnya atau memilih jalan yang berbeda?',
     coverImage: imageMap.get('novel-cover-2')!,
     genreIds: ['fantasi', 'aksi'],
@@ -100,6 +103,7 @@ export const novels: Novel[] = [
     slug: 'cinta-terlarang-dengan-ceo',
     title: 'Cinta Terlarang dengan CEO',
     author: 'Bunga Mawar',
+    authorId: 'user-writer-002',
     description: 'Seorang karyawan biasa yang tanpa sengaja menarik perhatian CEO dingin di perusahaannya. Hubungan mereka yang penuh lika-liku diuji oleh intrik kantor dan perbedaan status.',
     coverImage: imageMap.get('novel-cover-5')!,
     genreIds: ['romansa', 'drama'],
@@ -121,6 +125,7 @@ export const novels: Novel[] = [
     slug: 'the-dragons-chosen',
     title: 'The Dragon\'s Chosen',
     author: 'Elena Storm',
+    authorId: 'user-admin-001',
     description: 'In a world ruled by dragons, a young girl is chosen to be the next rider. She must bond with a fearsome dragon and save her kingdom from an ancient evil.',
     coverImage: imageMap.get('novel-cover-1')!,
     genreIds: ['fantasi', 'romansa'],
@@ -142,6 +147,7 @@ export const novels: Novel[] = [
     slug: 'the-immortal-chef',
     title: 'The Immortal Chef',
     author: 'Wei Lin',
+    authorId: 'user-admin-001',
     description: 'An immortal being, tired of eternal life, decides to open a small restaurant. Through his cooking, he touches the lives of his patrons in unexpected ways.',
     coverImage: imageMap.get('novel-cover-7')!,
     genreIds: ['fantasi', 'komedi'],
@@ -163,6 +169,7 @@ export const novels: Novel[] = [
     slug: 'midnight-academy',
     title: 'Midnight Academy',
     author: 'Sarah Knight',
+    authorId: 'user-admin-001',
     description: 'An academy for supernatural beings that only opens its gates at midnight. A human girl stumbles upon it and must navigate a world of vampires, werewolves, and witches.',
     coverImage: imageMap.get('novel-cover-6')!,
     genreIds: ['fantasi', 'romansa'],
@@ -184,6 +191,7 @@ export const novels: Novel[] = [
     slug: 'gema-di-ujung-senja',
     title: 'Gema di Ujung Senja',
     author: 'Ayu Lestari',
+    authorId: 'user-writer-002',
     description: 'Di sebuah dunia yang terbelah antara sihir dan teknologi, seorang gadis bernama Elara menemukan artefak kuno yang bisa mengubah takdir dunia. Ia harus berjuang melawan kekuatan gelap yang juga menginginkan artefak tersebut.',
     coverImage: imageMap.get('novel-cover-1')!,
     genreIds: ['fantasi'],
@@ -191,7 +199,7 @@ export const novels: Novel[] = [
     isFree: false,
     isR18: false,
     isFeatured: false,
-    status: 'ongoing',
+    status: 'pending',
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `gema-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -205,6 +213,7 @@ export const novels: Novel[] = [
     slug: 'jejak-sang-pengembara',
     title: 'Jejak Sang Pengembara',
     author: 'Budi Santoso',
+    authorId: 'user-admin-001',
     description: 'Kisah seorang pengembara tanpa nama yang berkelana dari satu kerajaan ke kerajaan lain, meninggalkan jejak-jejak perubahan di setiap tempat yang ia singgahi. Siapakah dia sebenarnya dan apa tujuan dari perjalanannya?',
     coverImage: imageMap.get('novel-cover-2')!,
     genreIds: ['fantasi'],
@@ -226,6 +235,7 @@ export const novels: Novel[] = [
     slug: 'bisikan-hutan-larangan',
     title: 'Bisikan Hutan Larangan',
     author: 'Ratih Pramudita',
+    authorId: 'user-writer-002',
     description: 'Sebuah hutan yang dikabarkan terkutuk menyimpan rahasia kelam sebuah desa. Ketika adiknya tersesat di dalamnya, Rian nekat masuk, hanya untuk menemukan bahwa bisikan-bisikan di hutan itu lebih dari sekadar legenda.',
     coverImage: imageMap.get('novel-cover-3')!,
     genreIds: ['misteri', 'fantasi'],
@@ -233,7 +243,7 @@ export const novels: Novel[] = [
     isFree: false,
     isR18: true,
     isFeatured: false,
-    status: 'ongoing',
+    status: 'pending',
     chapters: Array.from({ length: 20 }, (_, i) => ({
       id: `bisikan-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -247,6 +257,7 @@ export const novels: Novel[] = [
     slug: 'serpihan-rindu',
     title: 'Serpihan Rindu',
     author: 'Clara Angeline',
+    authorId: 'user-admin-001',
     description: 'Setelah lima tahun terpisah, takdir mempertemukan kembali Arka dan Laras di sebuah kafe kecil di sudut kota Praha. Namun, waktu telah mengubah banyak hal, dan keduanya harus menghadapi luka lama yang belum sembuh.',
     coverImage: imageMap.get('novel-cover-4')!,
     genreIds: ['romansa'],
@@ -268,6 +279,7 @@ export const novels: Novel[] = [
     slug: 'cinta-di-bawah-purnama',
     title: 'Cinta di Bawah Purnama',
     author: 'Dian Sasmita',
+    authorId: 'user-admin-001',
     description: 'Seorang pelukis jalanan bertemu dengan seorang pewaris kaya yang melarikan diri dari perjodohan. Pertemuan tak sengaja di malam bulan purnama membawa mereka pada sebuah kisah cinta yang mustahil dan penuh tantangan.',
     coverImage: imageMap.get('novel-cover-6')!,
     genreIds: ['romansa'],
@@ -289,6 +301,7 @@ export const novels: Novel[] = [
     slug: 'konspirasi-ibukota',
     title: 'Konspirasi Ibukota',
     author: 'Andra Wijaya',
+    authorId: 'user-admin-001',
     description: 'Seorang jurnalis investigasi menemukan sebuah data yang mengarah pada konspirasi besar di lingkaran pejabat tinggi negara. Kini, hidupnya dalam bahaya dan ia harus berpacu dengan waktu untuk mengungkap kebenaran.',
     coverImage: imageMap.get('novel-cover-7')!,
     genreIds: ['misteri'],
@@ -306,5 +319,3 @@ export const novels: Novel[] = [
     })),
   },
 ];
-
-    

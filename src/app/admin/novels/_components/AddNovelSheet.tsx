@@ -39,6 +39,8 @@ import { Badge } from "@/components/ui/badge";
 import { X, ShieldAlert } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
+import { useUser } from "@/contexts/UserContext";
+
 
 const formSchema = z.object({
   title: z.string().min(1, "Judul novel harus diisi."),
@@ -47,7 +49,7 @@ const formSchema = z.object({
   coverUrl: z.string().url("URL gambar tidak valid.").or(z.literal("")),
   genreIds: z.array(z.string()).min(1, "Pilih minimal satu genre."),
   tags: z.array(z.string()),
-  status: z.enum(["ongoing", "completed"]),
+  status: z.enum(["ongoing", "completed", "pending"]),
   freeChapters: z.coerce.number().min(0, "Jumlah chapter gratis tidak boleh negatif."),
   coinCost: z.coerce.number().min(0, "Harga koin tidak boleh negatif."),
   isFree: z.boolean(),
@@ -64,6 +66,8 @@ interface AddNovelSheetProps {
 }
 
 export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps) {
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
   const [coverPreview, setCoverPreview] = useState<string | null>('https://placehold.co/400x600/0f172a/94a3b8?text=Cover');
   const [tagInput, setTagInput] = useState("");
 
@@ -71,12 +75,12 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      author: "",
+      author: user?.name || "",
       description: "",
       coverUrl: "",
       genreIds: [],
       tags: [],
-      status: "ongoing",
+      status: isAdmin ? "ongoing" : "pending",
       freeChapters: 10,
       coinCost: 5,
       isFree: false,
@@ -88,6 +92,7 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
   const coverUrl = form.watch("coverUrl");
   const tags = form.watch("tags");
   const isFree = form.watch("isFree");
+  const genreIds = form.watch("genreIds");
 
   useEffect(() => {
     if (isFree) {
@@ -98,6 +103,12 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
         form.setValue("coinCost", 5);
     }
   }, [isFree, form]);
+  
+  useEffect(() => {
+    if (genreIds.includes('r18')) {
+        form.setValue("isR18", true);
+    }
+  }, [genreIds, form]);
 
 
   const onSubmit = (data: FormValues) => {
@@ -175,7 +186,7 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
                   <FormItem>
                     <FormLabel>Nama Penulis *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nama pena Anda" {...field} />
+                      <Input placeholder="Nama pena Anda" {...field} disabled={!isAdmin} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -273,8 +284,8 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
                 )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-               <FormField
+            {isAdmin && (
+                <FormField
                   control={form.control}
                   name="status"
                   render={({ field }) => (
@@ -289,12 +300,16 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
                             <SelectContent>
                                 <SelectItem value="ongoing">Berlanjut</SelectItem>
                                 <SelectItem value="completed">Tamat</SelectItem>
+                                <SelectItem value="pending">Menunggu</SelectItem>
                             </SelectContent>
                         </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+            )}
+            
+            <div className="grid grid-cols-2 gap-4">
                  <FormField
                   control={form.control}
                   name="freeChapters"
@@ -308,24 +323,20 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
                     </FormItem>
                   )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="coinCost"
+                  render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Harga Koin per Chapter</FormLabel>
+                      <FormControl>
+                      <Input type="number" {...field} disabled={isFree} />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+                  )}
+              />
             </div>
-
-             <FormField
-                control={form.control}
-                name="coinCost"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Harga Koin per Chapter</FormLabel>
-                    <FormControl>
-                    <Input type="number" {...field} disabled={isFree} />
-                    </FormControl>
-                     <FormDescription>
-                        Harga untuk chapter setelah chapter gratis habis.
-                    </FormDescription>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
 
             <div className="space-y-4">
                 <FormField
@@ -345,23 +356,25 @@ export function AddNovelSheet({ open, onOpenChange, onSave }: AddNovelSheetProps
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="isFeatured"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Tampilkan di Beranda</FormLabel>
-                            <FormDescription>
-                            Novel akan muncul di bagian unggulan.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
+                {isAdmin && (
+                    <FormField
+                        control={form.control}
+                        name="isFeatured"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <FormLabel className="text-base">Tampilkan di Beranda</FormLabel>
+                                <FormDescription>
+                                Novel akan muncul di bagian unggulan.
+                                </FormDescription>
+                            </div>
+                            <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                )}
             </div>
             
           </form>

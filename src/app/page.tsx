@@ -36,9 +36,11 @@ export default function Home() {
 
   }, []);
 
-  const featuredNovels = novels.filter(n => n.isFeatured).sort((a, b) => a.id.localeCompare(b.id));
-  const allNovels = novels.filter(n => !n.isFeatured);
-  const popularNovels = [...novels].sort((a, b) => b.stats.views - a.stats.views).slice(0, 5);
+  const visibleNovels = novels.filter(n => n.status === 'ongoing' || n.status === 'completed');
+
+  const featuredNovels = visibleNovels.filter(n => n.isFeatured).sort((a, b) => a.id.localeCompare(b.id));
+  const allNovels = visibleNovels.filter(n => !n.isFeatured);
+  const popularNovels = [...visibleNovels].sort((a, b) => b.stats.views - a.stats.views).slice(0, 5);
 
   return (
     <div className="w-full">
