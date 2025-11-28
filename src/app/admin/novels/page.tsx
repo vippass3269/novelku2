@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Plus, Copy, FilePenLine, Trash2, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -119,8 +119,10 @@ export default function KelolaNovelPage() {
                     </TableCell>
                     <TableCell className="text-center pr-6">
                       <div className="flex items-center justify-center gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Copy className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <Link href={`/admin/novels/${novel.slug}`}>
+                              <BookUp className="h-4 w-4" />
+                            </Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(novel)}>
                               <FilePenLine className="h-4 w-4" />
@@ -147,4 +149,3 @@ export default function KelolaNovelPage() {
     </>
   );
 }
-
