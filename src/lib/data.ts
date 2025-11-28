@@ -1,3 +1,4 @@
+
 import type { ImagePlaceholder } from './placeholder-images';
 import { PlaceHolderImages } from './placeholder-images';
 
@@ -45,6 +46,8 @@ export const genres: Genre[] = [
   { id: 'horor', slug: 'horor', name: 'Horor' },
   { id: 'komedi', slug: 'komedi', name: 'Komedi' },
   { id: 'drama', slug: 'drama', name: 'Drama' },
+  { id: 'slice-of-life', slug: 'slice-of-life', name: 'Slice of Life' },
+  { id: 'martial-arts', slug: 'martial-arts', name: 'Martial Arts' },
   { id: 'r18', slug: 'r18', name: 'R18+' },
 ];
 

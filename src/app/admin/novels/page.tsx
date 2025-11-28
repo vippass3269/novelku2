@@ -19,12 +19,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { EditNovelSheet } from "./_components/EditNovelSheet";
+import { AddNovelSheet } from "./_components/AddNovelSheet";
 
 const genreMap = new Map(genres.map(g => [g.id, g.name]));
 
 export default function KelolaNovelPage() {
   const [selectedNovel, setSelectedNovel] = useState<Novel | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
 
   const formatViews = (views: number) => {
     return new Intl.NumberFormat('id-ID').format(views);
@@ -32,15 +34,20 @@ export default function KelolaNovelPage() {
 
   const handleEditClick = (novel: Novel) => {
     setSelectedNovel(novel);
-    setIsSheetOpen(true);
+    setIsEditSheetOpen(true);
   };
+  
+  const handleAddClick = () => {
+    setIsAddSheetOpen(true);
+  };
+
 
   return (
     <>
       <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-              <Button variant="ghost" className="mb-4">
+              <Button variant="ghost" className="mb-4" asChild>
                   <Link href="/" className="flex items-center gap-2 text-muted-foreground">
                       <ArrowLeft />
                       Kembali
@@ -51,7 +58,7 @@ export default function KelolaNovelPage() {
               Tambah dan edit novel Anda
             </p>
           </div>
-          <Button size="lg">
+          <Button size="lg" onClick={handleAddClick}>
             <Plus className="mr-2 h-5 w-5" />
             Tambah Novel
           </Button>
@@ -139,10 +146,16 @@ export default function KelolaNovelPage() {
           </CardContent>
         </Card>
       </div>
+      
+      <AddNovelSheet
+        open={isAddSheetOpen}
+        onOpenChange={setIsAddSheetOpen}
+      />
+      
       {selectedNovel && (
         <EditNovelSheet
-          open={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
+          open={isEditSheetOpen}
+          onOpenChange={setIsEditSheetOpen}
           novel={selectedNovel}
         />
       )}
