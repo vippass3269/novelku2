@@ -71,6 +71,9 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      tags: [],
+    },
   });
 
   const coverUrl = form.watch("coverUrl");
@@ -85,9 +88,9 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
         description: novel.description,
         coverUrl: novel.coverImage.imageUrl,
         genreIds: novel.genreIds,
-        tags: [],
+        tags: [], // Placeholder, in a real app you'd load tags from the novel object
         status: novel.status,
-        freeChapters: novel.isFree ? 0 : 10,
+        freeChapters: novel.isFree ? 0 : novel.chapters.filter(c => c.cost === 0).length || 10,
         coinCost: novel.isFree ? 0 : novel.chapters.find(c => c.cost > 0)?.cost || 0,
         isFree: novel.isFree,
         isR18: novel.isR18,
