@@ -1,4 +1,6 @@
-import { genres, novels } from '@/lib/data';
+
+"use client";
+import { genres, novels as initialNovels } from '@/lib/data';
 import { NovelCard } from '@/components/novel/NovelCard';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
@@ -6,10 +8,20 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Star, Eye, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const featuredNovels = novels.slice(0, 3);
-  const allNovels = novels.slice(3);
+  // We use state to make the page dynamic when novels are updated.
+  const [novels, setNovels] = useState(initialNovels);
+
+  // In a real app, you might fetch this from an API and update the state.
+  // For now, we just use the initial data and this effect is for demonstration.
+  useEffect(() => {
+    setNovels(initialNovels);
+  }, []);
+
+  const featuredNovels = novels.filter(n => n.isFeatured);
+  const allNovels = novels.filter(n => !n.isFeatured);
   const popularNovels = [...novels].sort((a, b) => b.stats.views - a.stats.views).slice(0, 5);
 
   return (
@@ -25,7 +37,7 @@ export default function Home() {
         </section>
 
         <section className="mb-12">
-          <Carousel opts={{ loop: true }}>
+          <Carousel opts={{ loop: featuredNovels.length > 1 }}>
             <CarouselContent>
               {featuredNovels.map((novel) => (
                 <CarouselItem key={novel.id} className="md:basis-1/2 lg:basis-1/3">
@@ -128,3 +140,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

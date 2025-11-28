@@ -27,6 +27,7 @@ export interface Novel {
   };
   isFree: boolean;
   isR18: boolean;
+  isFeatured: boolean;
   status: 'ongoing' | 'completed';
 }
 
@@ -63,6 +64,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.9, views: 156002 },
     isFree: false,
     isR18: true,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 1 }, (_, i) => ({
       id: `malam-panas-${i + 1}`,
@@ -83,6 +85,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 567000 },
     isFree: false,
     isR18: false,
+    isFeatured: true,
     status: 'ongoing',
     chapters: Array.from({ length: 234 }, (_, i) => ({
       id: `raja-iblis-${i + 1}`,
@@ -103,6 +106,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.7, views: 345003 },
     isFree: false,
     isR18: false,
+    isFeatured: true,
     status: 'ongoing',
     chapters: Array.from({ length: 1 }, (_, i) => ({
       id: `ceo-cinta-${i + 1}`,
@@ -123,6 +127,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 125000 },
     isFree: false,
     isR18: false,
+    isFeatured: true,
     status: 'ongoing',
     chapters: Array.from({ length: 45 }, (_, i) => ({
       id: `dragon-${i + 1}`,
@@ -143,6 +148,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.9, views: 234000 },
     isFree: true,
     isR18: false,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 156 }, (_, i) => ({
       id: `chef-${i + 1}`,
@@ -163,6 +169,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.6, views: 445000 },
     isFree: false,
     isR18: false,
+    isFeatured: false,
     status: 'completed',
     chapters: Array.from({ length: 200 }, (_, i) => ({
       id: `midnight-${i + 1}`,
@@ -183,6 +190,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.7, views: 567000 },
     isFree: false,
     isR18: false,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `gema-${i + 1}`,
@@ -203,6 +211,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.9, views: 234000 },
     isFree: false,
     isR18: false,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 12 }, (_, i) => ({
         id: `jejak-${i + 1}`,
@@ -223,6 +232,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 125000 },
     isFree: false,
     isR18: true,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 20 }, (_, i) => ({
       id: `bisikan-${i + 1}`,
@@ -242,8 +252,9 @@ export const novels: Novel[] = [
     genreIds: ['romansa'],
     stats: { rating: 4.6, views: 320000 },
     isFree: true,
-    status: 'completed',
     isR18: false,
+    isFeatured: false,
+    status: 'completed',
     chapters: Array.from({ length: 8 }, (_, i) => ({
         id: `serpihan-${i + 1}`,
         slug: `bab-${i + 1}`,
@@ -263,6 +274,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.5, views: 180000 },
     isFree: false,
     isR18: false,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `cinta-${i + 1}`,
@@ -283,6 +295,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 450000 },
     isFree: false,
     isR18: false,
+    isFeatured: false,
     status: 'ongoing',
     chapters: Array.from({ length: 25 }, (_, i) => ({
       id: `konspirasi-${i + 1}`,
@@ -293,3 +306,5 @@ export const novels: Novel[] = [
     })),
   },
 ];
+
+    

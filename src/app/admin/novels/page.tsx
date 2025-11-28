@@ -97,6 +97,7 @@ export default function KelolaNovelPage() {
       },
       isFree: data.isFree,
       isR18: data.isR18,
+      isFeatured: data.isFeatured,
       status: data.status,
     };
     setNovels(prev => [newNovel, ...prev]);
@@ -121,7 +122,7 @@ export default function KelolaNovelPage() {
                 status: data.status,
                 isFree: data.isFree,
                 isR18: data.isR18,
-                // other fields from form can be updated here
+                isFeatured: data.isFeatured,
             }
         }
         return novel;
@@ -284,3 +285,5 @@ export default function KelolaNovelPage() {
     </>
   );
 }
+
+    

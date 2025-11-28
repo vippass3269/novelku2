@@ -94,7 +94,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
         coinCost: novel.isFree ? 0 : novel.chapters.find(c => c.cost > 0)?.cost || 0,
         isFree: novel.isFree,
         isR18: novel.isR18,
-        isFeatured: false, // Placeholder for isFeatured
+        isFeatured: novel.isFeatured,
       });
       setCoverPreview(null);
       setCoverFile(null);
@@ -291,7 +291,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                     <Button type="button" onClick={handleAddTag}>Tambah</Button>
                 </div>
                 <div className="flex flex-wrap gap-2 min-h-[24px]">
-                    {tags.map(tag => (
+                    {tags && tags.map(tag => (
                          <Badge key={tag} variant="secondary" className="font-normal">
                            {tag}
                            <button type="button" className="ml-1 rounded-full hover:bg-muted-foreground/20" onClick={() => form.setValue("tags", tags.filter(t => t !== tag))}>
@@ -423,3 +423,5 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
     </Sheet>
   );
 }
+
+    
