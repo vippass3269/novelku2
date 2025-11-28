@@ -88,6 +88,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
 
   const coverUrl = form.watch("coverUrl");
   const tags = form.watch("tags");
+  const isFree = form.watch("isFree");
 
   useEffect(() => {
     form.reset({
@@ -98,8 +99,8 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
       genreIds: novel.genreIds,
       tags: [],
       status: novel.status,
-      freeChapters: 10,
-      coinCost: novel.chapters.find(c => c.cost > 0)?.cost || 0,
+      freeChapters: novel.isFree ? 0 : 10,
+      coinCost: novel.isFree ? 0 : novel.chapters.find(c => c.cost > 0)?.cost || 0,
       isFree: novel.isFree,
       isR18: novel.isR18,
       isFeatured: false,
@@ -107,6 +108,14 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
     setCoverPreview(null);
     setCoverFile(null);
   }, [novel, form, open]);
+
+  useEffect(() => {
+    if (isFree) {
+      form.setValue("freeChapters", 0);
+      form.setValue("coinCost", 0);
+    }
+  }, [isFree, form]);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -300,6 +309,24 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                     ))}
                 </div>
             </div>
+            
+            <FormField
+                control={form.control}
+                name="isFree"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Novel Gratis</FormLabel>
+                        <FormDescription>
+                        Semua chapter novel ini gratis (tidak perlu koin).
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
 
             <div className="grid grid-cols-2 gap-4">
                <FormField
@@ -330,7 +357,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                     <FormItem>
                       <FormLabel>Jumlah Chapter Gratis</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} disabled={isFree} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -345,7 +372,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                 <FormItem>
                     <FormLabel>Harga Koin per Chapter</FormLabel>
                     <FormControl>
-                    <Input type="number" {...field} />
+                    <Input type="number" {...field} disabled={isFree} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>
@@ -353,23 +380,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
             />
 
             <div className="space-y-4">
-                <FormField
-                    control={form.control}
-                    name="isFree"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Novel Gratis</FormLabel>
-                            <FormDescription>
-                            Semua chapter novel ini gratis (tidak perlu koin).
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
+                
                 <FormField
                     control={form.control}
                     name="isR18"
@@ -420,7 +431,3 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
     </Sheet>
   );
 }
-
-    
-
-    

@@ -38,7 +38,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { X, ShieldAlert } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Judul novel harus diisi."),
@@ -86,6 +86,18 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
   
   const coverUrl = form.watch("coverUrl");
   const tags = form.watch("tags");
+  const isFree = form.watch("isFree");
+
+  useEffect(() => {
+    if (isFree) {
+      form.setValue("freeChapters", 0);
+      form.setValue("coinCost", 0);
+    } else {
+        form.setValue("freeChapters", 10);
+        form.setValue("coinCost", 5);
+    }
+  }, [isFree, form]);
+
 
   const onSubmit = (data: FormValues) => {
     console.log(data);
@@ -242,6 +254,24 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
                 </div>
             </div>
 
+             <FormField
+                control={form.control}
+                name="isFree"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Novel Gratis</FormLabel>
+                        <FormDescription>
+                        Semua chapter novel ini gratis (tidak perlu koin).
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
+
             <div className="grid grid-cols-2 gap-4">
                <FormField
                   control={form.control}
@@ -271,7 +301,7 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
                     <FormItem>
                       <FormLabel>Jumlah Chapter Gratis</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} disabled={isFree} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -286,7 +316,7 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
                 <FormItem>
                     <FormLabel>Harga Koin per Chapter</FormLabel>
                     <FormControl>
-                    <Input type="number" {...field} />
+                    <Input type="number" {...field} disabled={isFree} />
                     </FormControl>
                      <FormDescription>
                         Harga untuk chapter setelah chapter gratis habis.
@@ -297,23 +327,6 @@ export function AddNovelSheet({ open, onOpenChange }: AddNovelSheetProps) {
             />
 
             <div className="space-y-4">
-                <FormField
-                    control={form.control}
-                    name="isFree"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Novel Gratis</FormLabel>
-                            <FormDescription>
-                            Semua chapter novel ini gratis (tidak perlu koin).
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
                 <FormField
                     control={form.control}
                     name="isR18"
