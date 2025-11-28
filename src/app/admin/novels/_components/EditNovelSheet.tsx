@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,7 @@ const formSchema = z.object({
   title: z.string().min(1, "Judul novel harus diisi."),
   author: z.string().min(1, "Nama penulis harus diisi."),
   description: z.string().min(1, "Sinopsis harus diisi."),
-  coverUrl: z.string().url("URL gambar tidak valid."),
+  coverUrl: z.string().url("URL gambar tidak valid.").or(z.literal("")),
   genreIds: z.array(z.string()).min(1, "Pilih minimal satu genre."),
   tags: z.array(z.string()),
   status: z.enum(["ongoing", "completed"]),
@@ -64,6 +64,9 @@ interface EditNovelSheetProps {
 }
 
 export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProps) {
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [tagInput, setTagInput] = useState("");
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -82,6 +85,9 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
     },
   });
 
+  const coverUrl = form.watch("coverUrl");
+  const tags = form.watch("tags");
+
   useEffect(() => {
     form.reset({
       title: novel.title,
@@ -97,14 +103,34 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
       isR18: novel.isR18,
       isFeatured: false,
     });
-  }, [novel, form]);
+    setCoverPreview(null);
+  }, [novel, form, open]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setCoverPreview(dataUrl);
+        form.setValue("coverUrl", dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddTag = () => {
+    const newTag = tagInput.trim();
+    if (newTag && !tags.includes(newTag)) {
+      form.setValue("tags", [...tags, newTag]);
+    }
+    setTagInput("");
+  };
 
   const onSubmit = (data: FormValues) => {
     console.log(data);
     onOpenChange(false);
   };
-  
-  const tags = form.watch("tags");
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -120,14 +146,14 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
               <Label>Gambar Sampul</Label>
               <div className="flex gap-4 items-start">
                 <Image
-                  src={form.watch('coverUrl')}
+                  src={coverPreview || coverUrl || 'https://placehold.co/400x600/0f172a/94a3b8?text=Cover'}
                   alt="Cover"
                   width={100}
                   height={150}
                   className="rounded-md object-cover"
                 />
                 <div className="w-full space-y-2">
-                  <Input type="file" disabled />
+                  <Input type="file" onChange={handleFileChange} />
                   <FormField
                     control={form.control}
                     name="coverUrl"
@@ -135,7 +161,14 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                       <FormItem>
                          <FormLabel className="text-xs text-muted-foreground">Atau masukkan URL:</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input 
+                            {...field}
+                            onChange={(e) => {
+                                field.onChange(e);
+                                setCoverPreview(null);
+                            }}
+                            placeholder="https://..."
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -220,25 +253,21 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
             />
 
             <div className="space-y-2">
-                <Label>Tag</Label>
+                <Label htmlFor="tag-input-edit">Tag</Label>
                 <div className="flex gap-2">
-                    <Input placeholder="Tambah tag..." onKeyDown={(e) => {
+                    <Input id="tag-input-edit" placeholder="Tambah tag..." value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             e.preventDefault();
-                            const tag = e.currentTarget.value.trim();
-                            if(tag && !tags.includes(tag)){
-                                form.setValue("tags", [...tags, tag]);
-                            }
-                            e.currentTarget.value = "";
+                            handleAddTag();
                         }
                     }} />
-                    <Button type="button">Tambah</Button>
+                    <Button type="button" onClick={handleAddTag}>Tambah</Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 min-h-[24px]">
                     {tags.map(tag => (
                          <Badge key={tag} variant="secondary" className="font-normal">
                            {tag}
-                           <button type="button" className="ml-1" onClick={() => form.setValue("tags", tags.filter(t => t !== tag))}>
+                           <button type="button" className="ml-1 rounded-full hover:bg-muted-foreground/20" onClick={() => form.setValue("tags", tags.filter(t => t !== tag))}>
                             <X className="h-3 w-3"/>
                            </button>
                          </Badge>
@@ -302,11 +331,11 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                     control={form.control}
                     name="isFree"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-green-950/50 border-green-500/20">
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
                         <div className="space-y-0.5">
-                            <FormLabel className="text-base text-white">Novel Gratis</FormLabel>
-                            <FormDescription className="text-green-200/80">
-                            Semua chapter novel ini gratis (tidak perlu koin)
+                            <FormLabel className="text-base">Novel Gratis</FormLabel>
+                            <FormDescription>
+                            Semua chapter novel ini gratis (tidak perlu koin).
                             </FormDescription>
                         </div>
                         <FormControl>
@@ -323,7 +352,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                         <div className="space-y-0.5">
                             <FormLabel className="text-base">Konten Dewasa (R18)</FormLabel>
                             <FormDescription>
-                            Novel mengandung konten 18+
+                            Novel mengandung konten 18+.
                             </FormDescription>
                         </div>
                         <FormControl>
@@ -340,7 +369,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                         <div className="space-y-0.5">
                             <FormLabel className="text-base">Tampilkan di Beranda</FormLabel>
                             <FormDescription>
-                            Novel akan muncul di bagian unggulan
+                            Novel akan muncul di bagian unggulan.
                             </FormDescription>
                         </div>
                         <FormControl>
@@ -366,3 +395,4 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
   );
 }
 
+    
