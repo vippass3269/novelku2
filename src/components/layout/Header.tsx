@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -21,6 +21,8 @@ export default function Header() {
   const { user, coins } = useUser();
   const isLoggedIn = !!user;
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
+  const isAdmin = user?.role === 'admin';
+  const isWriter = user?.role === 'writer';
 
   return (
     <>
@@ -43,15 +45,25 @@ export default function Header() {
             <Link href="/library" passHref>
               <Button variant="ghost" className="flex items-center gap-2">
                 <Library className="h-5 w-5" />
-                Perpustakaan
+                Pustaka
               </Button>
             </Link>
-            <Link href="/admin/novels" passHref>
-              <Button variant="ghost" className="flex items-center gap-2">
-                <BookUp className="h-5 w-5" />
-                Kelola Novel
-              </Button>
-            </Link>
+            {(isAdmin || isWriter) && (
+              <Link href="/admin/novels" passHref>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <BookUp className="h-5 w-5" />
+                  Kelola Novel
+                </Button>
+              </Link>
+            )}
+            {isAdmin && (
+              <Link href="/admin/dashboard" passHref>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Admin Panel
+                </Button>
+              </Link>
+            )}
           </nav>
           
           <div className="flex flex-1 items-center justify-end gap-4">
@@ -85,7 +97,7 @@ export default function Header() {
                     <DropdownMenuItem asChild>
                         <Link href="/library">
                             <Library className="mr-2 h-4 w-4" />
-                            <span>Perpustakaan</span>
+                            <span>Pustaka</span>
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -94,13 +106,21 @@ export default function Header() {
                             <span>Toko Koin</span>
                         </Link>
                     </DropdownMenuItem>
-                    {user.role === 'admin' && (
+                    {(isAdmin || isWriter) && (
                       <DropdownMenuItem asChild>
                           <Link href="/admin/novels">
                               <BookUp className="mr-2 h-4 w-4" />
                               <span>Kelola Novel</span>
                           </Link>
                       </DropdownMenuItem>
+                    )}
+                    {isAdmin && (
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin/dashboard">
+                                <Shield className="mr-2 h-4 w-4" />
+                                <span>Admin Panel</span>
+                            </Link>
+                        </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
