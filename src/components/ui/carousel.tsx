@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -198,7 +199,9 @@ const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const { orientation, scrollPrev, canScrollPrev, opts } = useCarousel()
+  const isLoop = opts?.loop ?? false;
+
 
   return (
     <Button
@@ -212,7 +215,7 @@ const CarouselPrevious = React.forwardRef<
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
-      disabled={!canScrollPrev}
+      disabled={!canScrollPrev && !isLoop}
       onClick={scrollPrev}
       {...props}
     >
@@ -227,7 +230,8 @@ const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const { orientation, scrollNext, canScrollNext, opts } = useCarousel()
+  const isLoop = opts?.loop ?? false;
 
   return (
     <Button
@@ -241,7 +245,7 @@ const CarouselNext = React.forwardRef<
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
-      disabled={!canScrollNext}
+      disabled={!canScrollNext && !isLoop}
       onClick={scrollNext}
       {...props}
     >
