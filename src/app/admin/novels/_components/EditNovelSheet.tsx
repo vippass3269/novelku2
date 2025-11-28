@@ -132,7 +132,23 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
   };
 
   const onSubmit = (data: FormValues) => {
-    onSave(data);
+    // In a real app, you'd handle file upload to a server
+    // and get back a URL. Here we'll just use the preview if it exists.
+    const finalData = { ...data };
+    if (coverPreview) {
+        finalData.coverUrl = coverPreview;
+    }
+    
+    // Update localStorage to persist changes across pages
+    const novelsData = localStorage.getItem('novels_data');
+    if (novelsData) {
+        let novels = JSON.parse(novelsData);
+        novels = novels.map((n: Novel) => n.id === novel.id ? {...n, ...finalData, coverImage: { ...n.coverImage, imageUrl: finalData.coverUrl || n.coverImage.imageUrl }} : n);
+        localStorage.setItem('novels_data', JSON.stringify(novels));
+        window.dispatchEvent(new Event('storage')); // Trigger update on other pages
+    }
+
+    onSave(finalData);
     onOpenChange(false);
   };
 
@@ -423,5 +439,3 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
     </Sheet>
   );
 }
-
-    

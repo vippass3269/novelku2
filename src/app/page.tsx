@@ -1,6 +1,6 @@
 
 "use client";
-import { genres, novels as initialNovels } from '@/lib/data';
+import { novels as initialNovels, genres } from '@/lib/data';
 import { NovelCard } from '@/components/novel/NovelCard';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -11,13 +11,33 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  // We use state to make the page dynamic when novels are updated.
   const [novels, setNovels] = useState(initialNovels);
 
   // In a real app, you might fetch this from an API and update the state.
-  // For now, we just use the initial data and this effect is for demonstration.
   useEffect(() => {
-    setNovels(initialNovels);
+    // This is a mock to simulate data being updated from another page
+    // In a real app, you might use a global state manager (Context, Redux, Zustand)
+    // or re-fetch data. For now, we'll listen to localStorage changes.
+    const handleStorageChange = () => {
+        const novelsData = localStorage.getItem('novels_data');
+        if (novelsData) {
+            setNovels(JSON.parse(novelsData));
+        }
+    };
+    
+    // Set initial data in localStorage if not present
+    if (!localStorage.getItem('novels_data')) {
+        localStorage.setItem('novels_data', JSON.stringify(initialNovels));
+    } else {
+        handleStorageChange();
+    }
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
+
   }, []);
 
   const featuredNovels = novels.filter(n => n.isFeatured);
@@ -37,12 +57,15 @@ export default function Home() {
         </section>
 
         <section className="mb-12">
-          <Carousel opts={{ loop: featuredNovels.length > 1 }} className="relative">
+          <Carousel 
+            opts={{ loop: featuredNovels.length > 1 }} 
+            className="relative w-full max-w-6xl mx-auto"
+          >
             <CarouselContent>
               {featuredNovels.map((novel) => (
                 <CarouselItem key={novel.id} className="md:basis-1/2 lg:basis-1/3">
                   <Link href={`/novel/${novel.slug}`}>
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden group">
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden group mx-2">
                       <Image
                         src={novel.coverImage.imageUrl}
                         alt={`Cover of ${novel.title}`}
@@ -75,8 +98,8 @@ export default function Home() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 hidden md:flex" />
-            <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 hidden md:flex" />
+            <CarouselPrevious className="absolute left-[-1rem] top-1/2 -translate-y-1/2" />
+            <CarouselNext className="absolute right-[-1rem] top-1/2 -translate-y-1/2" />
           </Carousel>
         </section>
       </div>
