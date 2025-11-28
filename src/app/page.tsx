@@ -54,7 +54,7 @@ export default function Home() {
 
         <section className="mb-12">
           <Carousel 
-            opts={{ loop: featuredNovels.length > 1 }} 
+            opts={{ loop: true }} 
             className="relative w-full max-w-6xl mx-auto"
           >
             <CarouselContent>
