@@ -13,16 +13,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { X, ArrowLeft, Image as ImageIcon, CalendarIcon, Lock } from "lucide-react";
 import Image from "next/image";
 
-// This page is now client-side, but the route is dynamic.
-// For `output: export`, we need to tell Next.js which slugs to generate.
-// In a real app, you might not pre-render this for all novels
-// but for this project structure, it's needed.
-export async function generateStaticParams() {
-  return novels.map((novel) => ({
-    slug: novel.slug,
-  }));
-}
-
 export default function AddChapterPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
 
