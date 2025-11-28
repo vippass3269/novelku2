@@ -142,8 +142,8 @@ export default function ManageAuthorsPage() {
                           )}
                           {(user.role === 'admin' || user.role === 'writer') && (
                              <DropdownMenuItem className="text-destructive" onClick={() => handleRoleChange(user.id, 'user')}>
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Hapus Akses Penulis/Admin
+                                <UserIcon className="mr-2 h-4 w-4" />
+                                Jadikan Pengguna Biasa
                             </DropdownMenuItem>
                           )}
                       </DropdownMenuContent>
