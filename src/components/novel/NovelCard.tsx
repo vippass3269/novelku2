@@ -14,7 +14,7 @@ interface NovelCardProps {
 }
 
 export function NovelCard({ novel, className, aspectRatio = "portrait", width, height }: NovelCardProps) {
-  const isFree = novel.chapters.every(c => c.cost === 0);
+  const isPaidNovel = !novel.isFree && novel.chapters.some(c => c.cost > 0);
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -32,8 +32,8 @@ export function NovelCard({ novel, className, aspectRatio = "portrait", width, h
                           aspectRatio === "portrait" ? "aspect-[2/3]" : "aspect-square"
                       )}
                   />
-                  <Badge className="absolute top-2 right-2 border-none" variant={isFree ? "secondary" : "destructive"}>
-                    {isFree ? "Gratis" : "Berbayar"}
+                  <Badge className="absolute top-2 right-2 border-none" variant={isPaidNovel ? "destructive" : "secondary"}>
+                    {isPaidNovel ? "Berbayar" : "Gratis"}
                   </Badge>
                 </CardContent>
             </Card>

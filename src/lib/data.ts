@@ -24,6 +24,8 @@ export interface Novel {
     rating: number;
     views: number;
   };
+  isFree: boolean;
+  isR18: boolean;
 }
 
 export interface Genre {
@@ -42,6 +44,7 @@ export const genres: Genre[] = [
   { id: 'horor', slug: 'horor', name: 'Horor' },
   { id: 'komedi', slug: 'komedi', name: 'Komedi' },
   { id: 'drama', slug: 'drama', name: 'Drama' },
+  { id: 'r18', slug: 'r18', name: 'R18+' },
 ];
 
 export const novels: Novel[] = [
@@ -54,6 +57,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-1')!,
     genreIds: ['fantasi'],
     stats: { rating: 4.7, views: 567000 },
+    isFree: false,
+    isR18: false,
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `gema-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -71,6 +76,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-2')!,
     genreIds: ['fantasi'],
     stats: { rating: 4.9, views: 234000 },
+    isFree: false,
+    isR18: false,
     chapters: Array.from({ length: 12 }, (_, i) => ({
         id: `jejak-${i + 1}`,
         slug: `bab-${i + 1}`,
@@ -88,6 +95,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-3')!,
     genreIds: ['misteri', 'fantasi'],
     stats: { rating: 4.8, views: 125000 },
+    isFree: false,
+    isR18: true,
     chapters: Array.from({ length: 20 }, (_, i) => ({
       id: `bisikan-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -105,6 +114,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-4')!,
     genreIds: ['romansa'],
     stats: { rating: 4.6, views: 320000 },
+    isFree: true,
+    isR18: false,
     chapters: Array.from({ length: 8 }, (_, i) => ({
         id: `serpihan-${i + 1}`,
         slug: `bab-${i + 1}`,
@@ -122,6 +133,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-6')!,
     genreIds: ['romansa'],
     stats: { rating: 4.5, views: 180000 },
+    isFree: false,
+    isR18: false,
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `cinta-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -139,6 +152,8 @@ export const novels: Novel[] = [
     coverImage: imageMap.get('novel-cover-7')!,
     genreIds: ['misteri'],
     stats: { rating: 4.8, views: 450000 },
+    isFree: false,
+    isR18: false,
     chapters: Array.from({ length: 25 }, (_, i) => ({
       id: `konspirasi-${i + 1}`,
       slug: `bab-${i + 1}`,

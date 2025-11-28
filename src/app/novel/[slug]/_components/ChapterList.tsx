@@ -14,6 +14,9 @@ export default function ChapterList({ novel }: { novel: Novel }) {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
 
   const handleUnlockClick = (chapter: Chapter, chapterIndex: number) => {
+    // Free novels don't need unlocking
+    if (novel.isFree) return;
+    
     const isLocked = chapterIndex >= 10 && chapter.cost > 0;
     if (!isLocked || isChapterUnlocked(chapter.id)) {
       return;
@@ -35,8 +38,8 @@ export default function ChapterList({ novel }: { novel: Novel }) {
       <div className="border rounded-lg overflow-hidden bg-secondary/20">
         <ul className="divide-y divide-border">
           {novel.chapters.map((chapter, index) => {
-            const isLocked = index >= 10 && chapter.cost > 0;
-            const unlocked = !isLocked || isChapterUnlocked(chapter.id);
+            const isLockedByDefault = !novel.isFree && index >= 10 && chapter.cost > 0;
+            const unlocked = !isLockedByDefault || isChapterUnlocked(chapter.id);
             const ChapterLinkWrapper = unlocked ? Link : 'div';
             const props = unlocked ? { href: `/novel/${novel.slug}/${chapter.slug}` } : {};
 
@@ -51,7 +54,7 @@ export default function ChapterList({ novel }: { novel: Novel }) {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                       {unlocked && isLocked ? (
+                       {unlocked && isLockedByDefault ? (
                         <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                       ) : (
                          <span className="text-muted-foreground w-5 text-center flex-shrink-0">{index + 1}</span>

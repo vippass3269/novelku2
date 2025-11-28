@@ -32,7 +32,7 @@ export default function ChapterPage({ params }: { params: { slug: string; chapte
   const prevChapter = chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : null;
   const nextChapter = chapterIndex < novel.chapters.length - 1 ? novel.chapters[chapterIndex + 1] : null;
   
-  const isLocked = chapterIndex >= 10 && chapter.cost > 0;
+  const isLocked = !novel.isFree && chapterIndex >= 10 && chapter.cost > 0;
   const isUnlocked = !isLocked || isChapterUnlocked(chapter.id);
   
   if (!isClient) {
