@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
@@ -65,6 +66,7 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="start">
+                    <DropdownMenuGroup>
                       <DropdownMenuItem asChild>
                            <Link href="/admin/dashboard">
                               <Shield className="mr-2 h-4 w-4" />
@@ -83,6 +85,17 @@ export default function Header() {
                               <span>Manajemen Pengguna</span>
                           </Link>
                       </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                     <DropdownMenuGroup>
+                        <DropdownMenuLabel>Front-end Control</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                           <Link href="/admin/settings/banners">
+                              <ImageIcon className="mr-2 h-4 w-4" />
+                              <span>Manajemen Banner</span>
+                          </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
             )}
