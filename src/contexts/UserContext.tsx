@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { users as initialUsers } from '@/lib/users';
 
 interface User {
   id: string;
@@ -10,6 +11,7 @@ interface User {
   email: string;
   avatar: string;
   role: 'user' | 'admin' | 'writer';
+  verificationStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 interface UserContextType {
@@ -29,13 +31,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const initialCoins = 100;
 
 // Mock user data. In a real app, this would come from an auth provider.
-const mockUser: User = {
-  id: 'user-admin-001',
-  name: 'Pengguna Admin',
-  email: 'admin@novelku.com',
-  avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
-  role: 'admin',
-};
+const mockUser: User = initialUsers.find(u => u.role === 'admin')!;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();

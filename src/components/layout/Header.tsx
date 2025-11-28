@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield } from "lucide-react";
+import { BookMarked, Compass, Library, BookUp, LogOut, User, Coins, Store, Shield, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -57,12 +57,28 @@ export default function Header() {
               </Link>
             )}
             {isAdmin && (
-              <Link href="/admin/dashboard" passHref>
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Admin Panel
-                </Button>
-              </Link>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Admin Panel
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="start">
+                      <DropdownMenuItem asChild>
+                           <Link href="/admin/dashboard">
+                              <Shield className="mr-2 h-4 w-4" />
+                              <span>Dashboard</span>
+                          </Link>
+                      </DropdownMenuItem>
+                       <DropdownMenuItem asChild>
+                           <Link href="/admin/authors">
+                              <Users className="mr-2 h-4 w-4" />
+                              <span>Manajemen Penulis</span>
+                          </Link>
+                      </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
             )}
           </nav>
           
