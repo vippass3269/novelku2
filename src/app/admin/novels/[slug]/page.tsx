@@ -15,6 +15,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
+export async function generateStaticParams() {
+  return novels.map((novel) => ({
+    slug: novel.slug,
+  }));
+}
+
 export default function ManageNovelChaptersPage({ params }: { params: { slug: string } }) {
   const novel = novels.find((n) => n.slug === params.slug);
 

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { novels } from "@/lib/data";
+import { novels, genres } from "@/lib/data";
 import { notFound, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { R18Dialog } from "@/components/novel/R18Dialog";
 import { useUser } from "@/contexts/UserContext";
+
+const genreMap = new Map(genres.map(g => [g.id, g.name]));
+
+export async function generateStaticParams() {
+  return novels.map((novel) => ({
+    slug: novel.slug,
+  }));
+}
 
 export default function NovelPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
@@ -76,7 +84,7 @@ export default function NovelPage({ params }: { params: { slug: string } }) {
             <div className="flex flex-wrap gap-2 mb-6">
               {novel.genreIds.map(id => (
                   <Badge key={id} variant="secondary">
-                      {id}
+                      {genreMap.get(id) || id}
                   </Badge>
               ))}
             </div>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useState } from "react";
@@ -8,6 +9,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+
+export async function generateStaticParams() {
+  const params: { slug: string, chapter: string }[] = [];
+  novels.forEach(novel => {
+    novel.chapters.forEach(chapter => {
+      params.push({
+        slug: novel.slug,
+        chapter: chapter.slug
+      });
+    });
+  });
+  return params;
+}
 
 export default function ChapterPage({ params }: { params: { slug: string; chapter: string } }) {
   const router = useRouter();
