@@ -6,25 +6,39 @@ import { users as initialUsers, User } from '@/lib/users';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { MoreHorizontal, ArrowLeft, Shield, User as UserIcon, Star } from 'lucide-react';
+import { MoreHorizontal, ArrowLeft, Shield, User as UserIcon, Star, UserX, Coins } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 export default function ManageUsersPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
+  const { toast } = useToast();
 
-  // In a real app, you would define what "premium" means. 
-  // For now, we'll just add a placeholder property to the user object.
   const [premiumUsers, setPremiumUsers] = useState<string[]>(['user-reader-005']);
 
   const togglePremium = (userId: string) => {
     setPremiumUsers(prev => 
       prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
     );
+  };
+
+  const toggleSuspend = (userId: string) => {
+    setUsers(prev => prev.map(user => {
+        if (user.id === userId) {
+            toast({
+                title: user.isSuspended ? "Pengguna Diaktifkan" : "Pengguna Disuspend",
+                description: `Status pengguna ${user.name} telah diperbarui.`,
+            });
+            return { ...user, isSuspended: !user.isSuspended };
+        }
+        return user;
+    }));
   };
 
   return (
@@ -52,10 +66,11 @@ export default function ManageUsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[35%] pl-6">Pengguna</TableHead>
+                <TableHead className="w-[30%] pl-6">Pengguna</TableHead>
                 <TableHead>Peran</TableHead>
-                <TableHead>Status Keanggotaan</TableHead>
-                <TableHead>Tanggal Bergabung</TableHead>
+                <TableHead>Keanggotaan</TableHead>
+                <TableHead>Saldo Koin</TableHead>
+                <TableHead>Tgl Bergabung</TableHead>
                 <TableHead className="text-right pr-6">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -63,7 +78,7 @@ export default function ManageUsersPage() {
               {users.map((user) => {
                 const isPremium = premiumUsers.includes(user.id);
                 return (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className={cn(user.isSuspended && "bg-destructive/10 hover:bg-destructive/20")}>
                     <TableCell className="pl-6 font-medium">
                         <div className="flex items-center gap-4">
                             <Image
@@ -71,11 +86,11 @@ export default function ManageUsersPage() {
                                 alt={user.name}
                                 width={40}
                                 height={40}
-                                className="rounded-full object-cover"
-                            />
+                                className={cn("rounded-full object-cover", user.isSuspended && "grayscale")}/>
                             <div>
                                 <div className="font-semibold">{user.name}</div>
                                 <div className="text-sm text-muted-foreground">{user.email}</div>
+                                {user.isSuspended && <Badge variant="destructive" className="mt-1">Suspended</Badge>}
                             </div>
                         </div>
                     </TableCell>
@@ -100,6 +115,12 @@ export default function ManageUsersPage() {
                             </Badge>
                         )}
                     </TableCell>
+                     <TableCell>
+                        <div className="flex items-center gap-2">
+                           <Coins className="h-4 w-4 text-primary" />
+                           <span className="font-medium">{user.coins.toLocaleString('id-ID')}</span>
+                        </div>
+                    </TableCell>
                     <TableCell>
                         {format(new Date(user.joinedDate), 'dd MMM yyyy', { locale: id })}
                     </TableCell>
@@ -119,6 +140,11 @@ export default function ManageUsersPage() {
                                     <Star className="mr-2 h-4 w-4" />
                                 )}
                                 <span>{isPremium ? 'Jadikan Member Biasa' : 'Jadikan Member Premium'}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                             <DropdownMenuItem className={cn(user.isSuspended ? "text-green-400 focus:text-green-500" : "text-destructive focus:text-destructive")} onClick={() => toggleSuspend(user.id)}>
+                                <UserX className="mr-2 h-4 w-4" />
+                                <span>{user.isSuspended ? 'Batalkan Suspend' : 'Suspend Pengguna'}</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                         </DropdownMenu>

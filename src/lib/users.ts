@@ -8,6 +8,8 @@ export interface User {
   verificationStatus: 'pending' | 'approved' | 'rejected';
   novelsWritten: number;
   joinedDate: string; // ISO 8601 date string
+  coins: number;
+  isSuspended: boolean;
 }
 
 export const users: User[] = [
@@ -20,6 +22,8 @@ export const users: User[] = [
     verificationStatus: 'approved',
     novelsWritten: 8,
     joinedDate: '2023-01-15T10:00:00Z',
+    coins: 99999,
+    isSuspended: false,
   },
   {
     id: 'user-writer-002',
@@ -30,6 +34,8 @@ export const users: User[] = [
     verificationStatus: 'approved',
     novelsWritten: 3,
     joinedDate: '2023-05-20T14:30:00Z',
+    coins: 1500,
+    isSuspended: false,
   },
   {
     id: 'user-writer-003',
@@ -40,6 +46,8 @@ export const users: User[] = [
     verificationStatus: 'pending',
     novelsWritten: 1,
     joinedDate: '2024-06-10T09:00:00Z',
+    coins: 250,
+    isSuspended: false,
   },
     {
     id: 'user-writer-004',
@@ -50,6 +58,8 @@ export const users: User[] = [
     verificationStatus: 'rejected',
     novelsWritten: 0,
     joinedDate: '2024-07-01T11:00:00Z',
+    coins: 0,
+    isSuspended: true,
   },
    {
     id: 'user-reader-005',
@@ -60,5 +70,7 @@ export const users: User[] = [
     verificationStatus: 'approved',
     novelsWritten: 0,
     joinedDate: '2024-02-22T18:00:00Z',
+    coins: 120,
+    isSuspended: false,
   },
 ];
