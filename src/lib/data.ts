@@ -26,6 +26,7 @@ export interface Novel {
   };
   isFree: boolean;
   isR18: boolean;
+  status: 'ongoing' | 'completed';
 }
 
 export interface Genre {
@@ -48,6 +49,126 @@ export const genres: Genre[] = [
 ];
 
 export const novels: Novel[] = [
+    {
+    id: 'malam-panas-di-kota-jakarta',
+    slug: 'malam-panas-di-kota-jakarta',
+    title: 'Malam Panas di Kota Jakarta',
+    author: 'Dewi Malam',
+    description: 'Sebuah kisah romansa panas di tengah gemerlapnya kehidupan malam Jakarta. Pertemuan tak terduga yang mengubah segalanya.',
+    coverImage: imageMap.get('novel-cover-8')!,
+    genreIds: ['r18', 'romansa'],
+    stats: { rating: 4.9, views: 156002 },
+    isFree: false,
+    isR18: true,
+    status: 'ongoing',
+    chapters: Array.from({ length: 1 }, (_, i) => ({
+      id: `malam-panas-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: Pertemuan Pertama`,
+      content: `Konten untuk bab ${i+1}.`,
+      cost: i < 10 ? 0 : 15,
+    })),
+  },
+  {
+    id: 'sang-raja-iblis-terlahir-kembali',
+    slug: 'sang-raja-iblis-terlahir-kembali',
+    title: 'Sang Raja Iblis Terlahir Kembali',
+    author: 'Pendekar Langit',
+    description: 'Raja Iblis yang dikalahkan ribuan tahun lalu, kini bereinkarnasi ke dalam tubuh seorang pemuda biasa. Akankah ia mengulang takdirnya atau memilih jalan yang berbeda?',
+    coverImage: imageMap.get('novel-cover-2')!,
+    genreIds: ['fantasi', 'aksi'],
+    stats: { rating: 4.8, views: 567000 },
+    isFree: false,
+    isR18: false,
+    status: 'ongoing',
+    chapters: Array.from({ length: 234 }, (_, i) => ({
+      id: `raja-iblis-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: Kebangkitan`,
+      content: `Konten untuk bab ${i+1}.`,
+      cost: i < 10 ? 0 : 5,
+    })),
+  },
+  {
+    id: 'cinta-terlarang-dengan-ceo',
+    slug: 'cinta-terlarang-dengan-ceo',
+    title: 'Cinta Terlarang dengan CEO',
+    author: 'Bunga Mawar',
+    description: 'Seorang karyawan biasa yang tanpa sengaja menarik perhatian CEO dingin di perusahaannya. Hubungan mereka yang penuh lika-liku diuji oleh intrik kantor dan perbedaan status.',
+    coverImage: imageMap.get('novel-cover-5')!,
+    genreIds: ['romansa', 'drama'],
+    stats: { rating: 4.7, views: 345003 },
+    isFree: false,
+    isR18: false,
+    status: 'ongoing',
+    chapters: Array.from({ length: 1 }, (_, i) => ({
+      id: `ceo-cinta-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Bab ${i + 1}: Tatapan Pertama`,
+      content: `Konten untuk bab ${i+1}.`,
+      cost: i < 10 ? 0 : 10,
+    })),
+  },
+  {
+    id: 'the-dragons-chosen',
+    slug: 'the-dragons-chosen',
+    title: 'The Dragon\'s Chosen',
+    author: 'Elena Storm',
+    description: 'In a world ruled by dragons, a young girl is chosen to be the next rider. She must bond with a fearsome dragon and save her kingdom from an ancient evil.',
+    coverImage: imageMap.get('novel-cover-1')!,
+    genreIds: ['fantasi', 'romansa'],
+    stats: { rating: 4.8, views: 125000 },
+    isFree: false,
+    isR18: false,
+    status: 'ongoing',
+    chapters: Array.from({ length: 45 }, (_, i) => ({
+      id: `dragon-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Chapter ${i + 1}: The Choosing`,
+      content: `Content for chapter ${i+1}.`,
+      cost: i < 10 ? 0 : 10,
+    })),
+  },
+  {
+    id: 'the-immortal-chef',
+    slug: 'the-immortal-chef',
+    title: 'The Immortal Chef',
+    author: 'Wei Lin',
+    description: 'An immortal being, tired of eternal life, decides to open a small restaurant. Through his cooking, he touches the lives of his patrons in unexpected ways.',
+    coverImage: imageMap.get('novel-cover-7')!,
+    genreIds: ['fantasi', 'komedi'],
+    stats: { rating: 4.9, views: 234000 },
+    isFree: true,
+    isR18: false,
+    status: 'ongoing',
+    chapters: Array.from({ length: 156 }, (_, i) => ({
+      id: `chef-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Chapter ${i + 1}: A Pinch of Magic`,
+      content: `Content for chapter ${i+1}.`,
+      cost: 0,
+    })),
+  },
+  {
+    id: 'midnight-academy',
+    slug: 'midnight-academy',
+    title: 'Midnight Academy',
+    author: 'Sarah Knight',
+    description: 'An academy for supernatural beings that only opens its gates at midnight. A human girl stumbles upon it and must navigate a world of vampires, werewolves, and witches.',
+    coverImage: imageMap.get('novel-cover-6')!,
+    genreIds: ['fantasi', 'romansa'],
+    stats: { rating: 4.6, views: 445000 },
+    isFree: false,
+    isR18: false,
+    status: 'completed',
+    chapters: Array.from({ length: 200 }, (_, i) => ({
+      id: `midnight-${i + 1}`,
+      slug: `bab-${i + 1}`,
+      title: `Chapter ${i + 1}: The First Night`,
+      content: `Content for chapter ${i+1}.`,
+      cost: i < 10 ? 0 : 5,
+    })),
+  },
   {
     id: 'gema-di-ujung-senja',
     slug: 'gema-di-ujung-senja',
@@ -59,6 +180,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.7, views: 567000 },
     isFree: false,
     isR18: false,
+    status: 'ongoing',
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `gema-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -78,6 +200,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.9, views: 234000 },
     isFree: false,
     isR18: false,
+    status: 'ongoing',
     chapters: Array.from({ length: 12 }, (_, i) => ({
         id: `jejak-${i + 1}`,
         slug: `bab-${i + 1}`,
@@ -97,6 +220,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 125000 },
     isFree: false,
     isR18: true,
+    status: 'ongoing',
     chapters: Array.from({ length: 20 }, (_, i) => ({
       id: `bisikan-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -115,6 +239,7 @@ export const novels: Novel[] = [
     genreIds: ['romansa'],
     stats: { rating: 4.6, views: 320000 },
     isFree: true,
+    status: 'completed',
     isR18: false,
     chapters: Array.from({ length: 8 }, (_, i) => ({
         id: `serpihan-${i + 1}`,
@@ -135,6 +260,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.5, views: 180000 },
     isFree: false,
     isR18: false,
+    status: 'ongoing',
     chapters: Array.from({ length: 15 }, (_, i) => ({
       id: `cinta-${i + 1}`,
       slug: `bab-${i + 1}`,
@@ -154,6 +280,7 @@ export const novels: Novel[] = [
     stats: { rating: 4.8, views: 450000 },
     isFree: false,
     isR18: false,
+    status: 'ongoing',
     chapters: Array.from({ length: 25 }, (_, i) => ({
       id: `konspirasi-${i + 1}`,
       slug: `bab-${i + 1}`,
