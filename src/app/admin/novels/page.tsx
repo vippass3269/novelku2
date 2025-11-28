@@ -17,7 +17,7 @@ import {
 import { ArrowLeft, Plus, BookUp, FilePenLine, Trash2, ShieldAlert, Coins } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditNovelSheet } from "./_components/EditNovelSheet";
 import { AddNovelSheet } from "./_components/AddNovelSheet";
 import { useUser } from "@/contexts/UserContext";
@@ -35,6 +35,34 @@ export default function KelolaNovelPage() {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+        const novelsData = localStorage.getItem('novels_data');
+        if (novelsData) {
+            setNovels(JSON.parse(novelsData));
+        }
+    };
+    
+    if (!localStorage.getItem('novels_data')) {
+        localStorage.setItem('novels_data', JSON.stringify(initialNovels));
+    } else {
+        handleStorageChange();
+    }
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const updateNovelsInStorage = (updatedNovels: Novel[]) => {
+    setNovels(updatedNovels);
+    localStorage.setItem('novels_data', JSON.stringify(updatedNovels));
+    window.dispatchEvent(new Event('storage'));
+  }
+
 
   const isAdmin = user?.role === 'admin';
 
@@ -66,7 +94,8 @@ export default function KelolaNovelPage() {
   
   const confirmDelete = () => {
     if (novelToDelete) {
-      setNovels(currentNovels => currentNovels.filter(n => n.id !== novelToDelete.id));
+      const updatedNovels = novels.filter(n => n.id !== novelToDelete.id);
+      updateNovelsInStorage(updatedNovels);
       toast({
         title: "Berhasil",
         description: `Novel "${novelToDelete.title}" telah dihapus.`,
@@ -100,7 +129,7 @@ export default function KelolaNovelPage() {
       isFeatured: data.isFeatured,
       status: data.status,
     };
-    setNovels(prev => [newNovel, ...prev]);
+    updateNovelsInStorage([newNovel, ...novels]);
     toast({
         title: "Novel Ditambahkan",
         description: `Novel "${data.title}" berhasil dibuat.`,
@@ -110,14 +139,14 @@ export default function KelolaNovelPage() {
   const handleUpdateNovel = (data: any) => {
     if(!selectedNovel) return;
     
-    setNovels(prev => prev.map(novel => {
+    const updatedNovels = novels.map(novel => {
         if(novel.id === selectedNovel.id) {
             return {
                 ...novel,
                 title: data.title,
                 author: data.author,
                 description: data.description,
-                coverImage: data.coverUrl ? { ...novel.coverImage, imageUrl: data.coverUrl } : novel.coverImage,
+                coverImage: { ...novel.coverImage, imageUrl: data.coverUrl || novel.coverImage.imageUrl },
                 genreIds: data.genreIds,
                 status: data.status,
                 isFree: data.isFree,
@@ -126,7 +155,9 @@ export default function KelolaNovelPage() {
             }
         }
         return novel;
-    }));
+    });
+
+    updateNovelsInStorage(updatedNovels);
 
      toast({
         title: "Novel Diperbarui",

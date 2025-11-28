@@ -9,15 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Eye, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import type { Novel } from '@/lib/data';
 
 export default function Home() {
-  const [novels, setNovels] = useState(initialNovels);
+  const [novels, setNovels] = useState<Novel[]>(initialNovels);
 
-  // In a real app, you might fetch this from an API and update the state.
   useEffect(() => {
-    // This is a mock to simulate data being updated from another page
-    // In a real app, you might use a global state manager (Context, Redux, Zustand)
-    // or re-fetch data. For now, we'll listen to localStorage changes.
     const handleStorageChange = () => {
         const novelsData = localStorage.getItem('novels_data');
         if (novelsData) {
@@ -25,7 +22,6 @@ export default function Home() {
         }
     };
     
-    // Set initial data in localStorage if not present
     if (!localStorage.getItem('novels_data')) {
         localStorage.setItem('novels_data', JSON.stringify(initialNovels));
     } else {
@@ -98,8 +94,8 @@ export default function Home() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-[-1rem] top-1/2 -translate-y-1/2" />
-            <CarouselNext className="absolute right-[-1rem] top-1/2 -translate-y-1/2" />
+            <CarouselPrevious className="absolute left-[-1rem] top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute right-[-1rem] top-1/2 -translate-y-1/2 z-10" />
           </Carousel>
         </section>
       </div>

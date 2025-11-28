@@ -77,7 +77,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
   });
 
   const coverUrl = form.watch("coverUrl");
-  const tags = form.watch("tags");
+  const tags = form.watch("tags") || [];
   const isFree = form.watch("isFree");
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
       reader.onloadend = () => {
         const dataUrl = reader.result as string;
         setCoverPreview(dataUrl);
-        form.setValue("coverUrl", ""); // Clear URL if a file is chosen
+        form.setValue("coverUrl", dataUrl); // Set the form value to the data URL
       };
       reader.readAsDataURL(file);
     }
@@ -132,23 +132,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
   };
 
   const onSubmit = (data: FormValues) => {
-    // In a real app, you'd handle file upload to a server
-    // and get back a URL. Here we'll just use the preview if it exists.
-    const finalData = { ...data };
-    if (coverPreview) {
-        finalData.coverUrl = coverPreview;
-    }
-    
-    // Update localStorage to persist changes across pages
-    const novelsData = localStorage.getItem('novels_data');
-    if (novelsData) {
-        let novels = JSON.parse(novelsData);
-        novels = novels.map((n: Novel) => n.id === novel.id ? {...n, ...finalData, coverImage: { ...n.coverImage, imageUrl: finalData.coverUrl || n.coverImage.imageUrl }} : n);
-        localStorage.setItem('novels_data', JSON.stringify(novels));
-        window.dispatchEvent(new Event('storage')); // Trigger update on other pages
-    }
-
-    onSave(finalData);
+    onSave(data);
     onOpenChange(false);
   };
 
@@ -204,6 +188,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                                 <FormControl>
                                 <Input 
                                     {...field}
+                                    value={field.value ?? ''}
                                     onChange={(e) => {
                                         field.onChange(e);
                                         setCoverPreview(null);
@@ -307,7 +292,7 @@ export function EditNovelSheet({ open, onOpenChange, novel, onSave }: EditNovelS
                     <Button type="button" onClick={handleAddTag}>Tambah</Button>
                 </div>
                 <div className="flex flex-wrap gap-2 min-h-[24px]">
-                    {tags && tags.map(tag => (
+                    {tags.map(tag => (
                          <Badge key={tag} variant="secondary" className="font-normal">
                            {tag}
                            <button type="button" className="ml-1 rounded-full hover:bg-muted-foreground/20" onClick={() => form.setValue("tags", tags.filter(t => t !== tag))}>
