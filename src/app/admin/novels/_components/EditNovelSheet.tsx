@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Image as ImageIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const formSchema = z.object({
@@ -66,6 +66,7 @@ interface EditNovelSheetProps {
 export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProps) {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -104,16 +105,18 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
       isFeatured: false,
     });
     setCoverPreview(null);
+    setCoverFile(null);
   }, [novel, form, open]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setCoverFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         const dataUrl = reader.result as string;
         setCoverPreview(dataUrl);
-        form.setValue("coverUrl", dataUrl);
+        form.setValue("coverUrl", ""); // Clear URL if a file is chosen
       };
       reader.readAsDataURL(file);
     }
@@ -153,27 +156,50 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
                   className="rounded-md object-cover"
                 />
                 <div className="w-full space-y-2">
-                  <Input type="file" onChange={handleFileChange} />
-                  <FormField
-                    control={form.control}
-                    name="coverUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                         <FormLabel className="text-xs text-muted-foreground">Atau masukkan URL:</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field}
-                            onChange={(e) => {
-                                field.onChange(e);
-                                setCoverPreview(null);
-                            }}
-                            placeholder="https://..."
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <div className="border border-dashed rounded-lg p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                             <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                             <span className="text-sm text-muted-foreground flex-1">
+                                {coverFile ? coverFile.name : "Pilih file gambar baru..."}
+                             </span>
+                             <Button variant="outline" size="sm" asChild>
+                                <label htmlFor="cover-file-upload-edit" className="cursor-pointer">
+                                    Pilih Gambar
+                                    <input id="cover-file-upload-edit" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
+                                </label>
+                            </Button>
+                        </div>
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">
+                                Atau
+                                </span>
+                            </div>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="coverUrl"
+                            render={({ field }) => (
+                            <FormItem className="mt-3">
+                                <FormControl>
+                                <Input 
+                                    {...field}
+                                    onChange={(e) => {
+                                        field.onChange(e);
+                                        setCoverPreview(null);
+                                        setCoverFile(null);
+                                    }}
+                                    placeholder="Masukkan URL gambar sampul"
+                                />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
               </div>
             </div>
@@ -394,5 +420,7 @@ export function EditNovelSheet({ open, onOpenChange, novel }: EditNovelSheetProp
     </Sheet>
   );
 }
+
+    
 
     
